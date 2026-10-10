@@ -231,8 +231,8 @@ def place(dev, cx, cy):
     canvas.alpha_composite(dev, (x, y))
 
 
-place(tablet(cover, 1130, 4), 730, 1075)
-place(tablet(daily, 1300, -1.5), 1585, 1045)
+place(tablet(cover, 1130, -4), 1690, 1085)     # cover on the right, behind
+place(tablet(daily, 1300, 1.5), 815, 1050)       # daily page on the left, in front
 
 # pencil lying on the cover
 pen = Image.new("RGBA", (900, 30), (0, 0, 0, 0))
@@ -249,13 +249,13 @@ pen.paste(body, (0, 0), mk)
 pd.polygon([(850, 4), (900, 15), (850, 26)], fill=(232, 228, 222, 255))
 pd.polygon([(888, 12), (900, 15), (888, 18)], fill=(60, 56, 54, 255))
 pd.rectangle((120, 5, 720, 7), fill=(255, 255, 255, 255))
-pen = pen.rotate(-80, expand=True, resample=Image.BICUBIC)
-drop(pen.split()[3], 380, 720, [(36, 52, 22, .30), (14, 20, 7, .45), (4, 6, 3, .6)])
-canvas.alpha_composite(pen, (380, 720))
+pen = pen.rotate(-100, expand=True, resample=Image.BICUBIC)
+drop(pen.split()[3], 1905, 705, [(36, 52, 22, .30), (14, 20, 7, .45), (4, 6, 3, .6)])
+canvas.alpha_composite(pen, (1905, 705))
 
 
 # "+1000 STICKERS" seal
-sx, sy, sr = 190, 600, 97
+sx, sy, sr = 175, 385, 97
 seal = Image.new("RGBA", (sr * 2 + 40, sr * 2 + 40), (0, 0, 0, 0))
 sd = ImageDraw.Draw(seal)
 sc = sr + 20
@@ -285,7 +285,7 @@ gap = 22
 lab_font = ImageFont.truetype(sans, 19)
 LEFT = 505                                         # left edge of the cover tablet
 lab_w = sum(d.textlength(c, font=lab_font) for c in "WORKS WITH") + 5 * 9
-x0 = int(LEFT + lab_w + 28)
+x0 = 2050 - (IC * 4 + gap * 3)                   # icons sit above the cover tablet, on the right
 mk_i = Image.new("L", (IC, IC), 0); ImageDraw.Draw(mk_i).rounded_rectangle((0, 0, IC - 1, IC - 1), radius=21, fill=255)
 x = x0
 for ic in tiles:
