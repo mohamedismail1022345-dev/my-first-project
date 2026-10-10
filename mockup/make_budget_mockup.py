@@ -3,6 +3,7 @@ Usage: python3 make_budget_mockup.py <budget_source.jpg> <icons_source.webp> <ou
 <budget_source> supplies the cover + daily page (the pencil lying on it is painted out);
 <icons_source> is the ADHD mockup image, used only for the four app icons."""
 import sys
+import math
 import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
@@ -253,9 +254,28 @@ drop(pen.split()[3], 380, 720, [(36, 52, 22, .30), (14, 20, 7, .45), (4, 6, 3, .
 canvas.alpha_composite(pen, (380, 720))
 
 
+# "+1000 STICKERS" seal
+sx, sy, sr = 190, 600, 97
+seal = Image.new("RGBA", (sr * 2 + 40, sr * 2 + 40), (0, 0, 0, 0))
+sd = ImageDraw.Draw(seal)
+sc = sr + 20
+for i in range(26):
+    a = i * 2 * math.pi / 26
+    sd.ellipse((sc + (sr - 6) * math.cos(a) - 12, sc + (sr - 6) * math.sin(a) - 12, sc + (sr - 6) * math.cos(a) + 12, sc + (sr - 6) * math.sin(a) + 12), fill=(122, 88, 72, 255))
+sd.ellipse((sc - sr + 6, sc - sr + 6, sc + sr - 6, sc + sr - 6), fill=(122, 88, 72, 255))
+sd.ellipse((sc - sr + 18, sc - sr + 18, sc + sr - 18, sc + sr - 18), outline=(236, 220, 200, 255), width=2)
+tf = ImageFont.truetype(serif, 52); sf = ImageFont.truetype(sans, 16)
+cream = (250, 242, 232, 255)
+sd.text((sc, sc - 18), "+1000", font=tf, fill=cream, anchor="mm")
+spaced(sd, (sc, sc + 18), "STICKERS", sf, cream, 4)
+sd.line([(sc - 45, sc + 12), (sc + 45, sc + 12)], fill=cream, width=2)
+seal = seal.rotate(10, expand=True, resample=Image.BICUBIC)
+drop(seal.split()[3], sx - seal.width // 2, sy - seal.height // 2, [(30, 46, 22, .3), (10, 16, 8, .45), (3, 5, 3, .55)])
+canvas.alpha_composite(seal, (sx - seal.width // 2, sy - seal.height // 2))
+
 d = ImageDraw.Draw(canvas)
 ink = (96, 70, 58)
-spaced(d, (W / 2, 44), "2026 - 2027", ImageFont.truetype(serif, 40), ink, 9)
+spaced(d, (W / 2, 44), "2026 - 2027   \u2022   +1000 STICKERS", ImageFont.truetype(serif, 40), ink, 9)
 spaced(d, (W / 2, 94), "BUDGET PLANNER", ImageFont.truetype(serif, 108), ink, 16)
 spaced(d, (W / 2, 232), "A CALM SYSTEM FOR YOUR MONEY", ImageFont.truetype(sans, 29), (252, 249, 245), 8)
 # app icons (original artwork, cropped from the source mockup)
