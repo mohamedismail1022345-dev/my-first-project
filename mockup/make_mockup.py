@@ -2,14 +2,16 @@
 Usage: python3 make_mockup.py <source_mockup.webp> <out.png>
 The daily page and cover are cropped unchanged from the source mockup."""
 import sys
-from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
 SRC, OUT = sys.argv[1], sys.argv[2]
 W, H = 2400, 1800
 src = Image.open(SRC).convert("RGB")
 daily = src.crop((667, 398, 1143, 1070))   # screen only, bezel removed
 cover = src.crop((111, 395, 598, 1080))
-icons = [src.crop(b) for b in [(485, 302, 547, 362), (559, 302, 621, 362), (635, 302, 697, 362), (709, 302, 771, 362)]]
+# only integrations the planner really links to: Google Calendar and ChatGPT (crops) + Apple Shortcuts (drawn)
+icon_gcal = src.crop((635, 302, 697, 362))
+icon_gpt = src.crop((709, 302, 771, 362))
 
 F = "/usr/share/fonts/truetype/"
 serif = F + "liberation/LiberationSerif-Regular.ttf"
@@ -86,6 +88,13 @@ def tablet(screen, height, angle):
     sh_ = height - 2 * pad
     sw = int(screen.width * sh_ / screen.height)
     scr = screen.resize((sw, sh_), Image.LANCZOS)
+    # edge-aware sharpening: crisp text/lines, smooth paper (keeps JPEG noise from being amplified)
+    flat = scr.filter(ImageFilter.MedianFilter(3)).filter(ImageFilter.GaussianBlur(0.5))
+    crisp = scr.filter(ImageFilter.UnsharpMask(radius=1.8, percent=150, threshold=2))
+    edge = scr.convert("L").filter(ImageFilter.FIND_EDGES).filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(1.5))
+    edge = edge.point(lambda v: min(255, v * 5))
+    scr = Image.composite(crisp, flat, edge)
+    scr = ImageEnhance.Contrast(scr).enhance(1.08)
     w, h = sw + 2 * pad, height
     m = Image.new("L", (sw, sh_), 0)
     ImageDraw.Draw(m).rounded_rectangle((0, 0, sw - 1, sh_ - 1), radius=int(pad * 1.1), fill=255)
@@ -138,8 +147,8 @@ def place(dev, cx, cy):
     canvas.alpha_composite(dev, (x, y))
 
 
-place(tablet(cover, 1060, 4), 790, 1105)
-place(tablet(daily, 1130, -3), 1530, 1125)
+place(tablet(cover, 1130, 4), 770, 1115)
+place(tablet(daily, 1270, -2), 1590, 1060)
 
 # pencil lying on the cover
 pen = Image.new("RGBA", (900, 30), (0, 0, 0, 0))
@@ -238,37 +247,63 @@ def sparkle(d, n, col=(214, 168, 84)):
 
 
 # "+1000 STICKERS" seal
-sx, sy, sr = 260, 650, 150
+sx, sy, sr = 235, 600, 108
 seal = Image.new("RGBA", (sr * 2 + 40, sr * 2 + 40), (0, 0, 0, 0))
 sd = ImageDraw.Draw(seal)
 sc = sr + 20
-for i in range(28):
-    a = i * 2 * math.pi / 28
-    sd.ellipse((sc + (sr - 8) * math.cos(a) - 16, sc + (sr - 8) * math.sin(a) - 16, sc + (sr - 8) * math.cos(a) + 16, sc + (sr - 8) * math.sin(a) + 16), fill=(122, 88, 72, 255))
-sd.ellipse((sc - sr + 8, sc - sr + 8, sc + sr - 8, sc + sr - 8), fill=(122, 88, 72, 255))
-sd.ellipse((sc - sr + 24, sc - sr + 24, sc + sr - 24, sc + sr - 24), outline=(236, 220, 200, 255), width=3)
-tf = ImageFont.truetype(serif, 80); sf = ImageFont.truetype(sans, 25)
+for i in range(26):
+    a = i * 2 * math.pi / 26
+    sd.ellipse((sc + (sr - 6) * math.cos(a) - 12, sc + (sr - 6) * math.sin(a) - 12, sc + (sr - 6) * math.cos(a) + 12, sc + (sr - 6) * math.sin(a) + 12), fill=(122, 88, 72, 255))
+sd.ellipse((sc - sr + 6, sc - sr + 6, sc + sr - 6, sc + sr - 6), fill=(122, 88, 72, 255))
+sd.ellipse((sc - sr + 18, sc - sr + 18, sc + sr - 18, sc + sr - 18), outline=(236, 220, 200, 255), width=2)
+tf = ImageFont.truetype(serif, 58); sf = ImageFont.truetype(sans, 18)
 cream = (250, 242, 232, 255)
-sd.text((sc, sc - 28), "+1000", font=tf, fill=cream, anchor="mm")
-spaced(sd, (sc, sc + 28), "STICKERS", sf, cream, 5)
-sd.line([(sc - 70, sc + 18), (sc + 70, sc + 18)], fill=cream, width=2)
+sd.text((sc, sc - 20), "+1000", font=tf, fill=cream, anchor="mm")
+spaced(sd, (sc, sc + 20), "STICKERS", sf, cream, 4)
+sd.line([(sc - 50, sc + 13), (sc + 50, sc + 13)], fill=cream, width=2)
 seal = seal.rotate(10, expand=True, resample=Image.BICUBIC)
 drop(seal.split()[3], sx - seal.width // 2, sy - seal.height // 2, [(30, 46, 22, .3), (10, 16, 8, .45), (3, 5, 3, .55)])
 canvas.alpha_composite(seal, (sx - seal.width // 2, sy - seal.height // 2))
 
 d = ImageDraw.Draw(canvas)
 ink = (96, 70, 58)
-spaced(d, (W / 2, 70), "2026 - 2027   \u2022   +1000 STICKERS", ImageFont.truetype(serif, 52), ink, 10)
-spaced(d, (W / 2, 140), "ADHD PLANNER", ImageFont.truetype(serif, 138), ink, 20)
-spaced(d, (W / 2, 318), "PLANNER FOR ADHD & NEURODIVERGENT BRAINS", ImageFont.truetype(sans, 36), (252, 249, 245), 9)
-# app icons, top right
-x = 1855
-for ic in icons:
-    ic = ic.resize((100, 100), Image.LANCZOS)
-    m = Image.new("L", ic.size, 0); ImageDraw.Draw(m).rounded_rectangle((0, 0, 99, 99), radius=23, fill=255)
-    canvas.paste(ic, (x, 405), m)
-    x += 120
-spaced(d, (W / 2, 1722), "dreamwy", ImageFont.truetype(serif, 54), ink, 12)
+spaced(d, (W / 2, 52), "2026 - 2027   \u2022   +1000 STICKERS", ImageFont.truetype(serif, 40), ink, 9)
+spaced(d, (W / 2, 108), "ADHD PLANNER", ImageFont.truetype(serif, 108), ink, 16)
+spaced(d, (W / 2, 252), "PLANNER FOR ADHD & NEURODIVERGENT BRAINS", ImageFont.truetype(sans, 29), (252, 249, 245), 8)
+# integrations the planner genuinely links to: Apple Shortcuts, Google Calendar, ChatGPT
+def shortcuts_icon(n):
+    k = 4
+    big = Image.new("RGBA", (n * k, n * k))
+    g = Image.new("RGB", big.size)
+    gd = ImageDraw.Draw(g)
+    for i in range(big.width * 2):
+        t = i / (big.width * 2)
+        c = (int(238 - 40 * t), int(60 + 110 * t), int(130 - 80 * t)) if t < .5 else (int(218 + 30 * (t - .5)), int(115 + 40 * (t - .5)), int(105 - 20 * (t - .5)))
+        gd.line([(i, 0), (0, i)], fill=c, width=3)
+    big.paste(g, (0, 0))
+    ov = Image.new("RGBA", big.size, (0, 0, 0, 0))
+    od = ImageDraw.Draw(ov)
+    u = n * k
+    od.rounded_rectangle((u * .22, u * .2, u * .66, u * .64), radius=int(u * .1), fill=(255, 255, 255, 235))
+    od.rounded_rectangle((u * .34, u * .36, u * .78, u * .8), radius=int(u * .1), fill=(255, 255, 255, 150))
+    ov = ov.rotate(0)
+    big.alpha_composite(ov)
+    return big.resize((n, n), Image.LANCZOS).convert("RGB")
+
+IC = 88
+tiles = [shortcuts_icon(IC)] + [i.resize((IC, IC), Image.LANCZOS).filter(ImageFilter.UnsharpMask(1.2, 90, 0)) for i in (icon_gcal, icon_gpt)]
+gap = 24
+x0 = 2050 - (IC * 3 + gap * 2)
+mk_i = Image.new("L", (IC, IC), 0); ImageDraw.Draw(mk_i).rounded_rectangle((0, 0, IC - 1, IC - 1), radius=21, fill=255)
+spaced(d, (x0 - 28 - 105, 306 + 22), "WORKS WITH", ImageFont.truetype(sans, 19), ink, 5)
+x = x0
+for ic in tiles:
+    tile = Image.new("RGBA", (IC, IC)); tile.paste(ic, (0, 0)); tile.putalpha(mk_i)
+    drop(mk_i, x, 306, [(2, 4, 3, .35), (6, 12, 12, .25)])
+    canvas.alpha_composite(tile, (x, 306))
+    x += IC + gap
+d = ImageDraw.Draw(canvas)
+spaced(d, (W / 2, 1728), "dreamwy", ImageFont.truetype(serif, 46), ink, 11)
 import random
 out = canvas.convert("RGB")
 vg = Image.new("L", (W, H), 0)
