@@ -23,10 +23,19 @@ for y in range(H):
     px.line([(0, y), (W, y)], fill=(int(206 - 20 * t), int(195 - 22 * t), int(184 - 22 * t)))
 sh = Image.new("L", (W, H), 0)
 d = ImageDraw.Draw(sh)
-d.polygon([(0, 0), (520, 0), (180, H)], fill=60)
-d.polygon([(1700, 0), (W, 0), (W, 500)], fill=45)
-sh = sh.filter(ImageFilter.GaussianBlur(120))
-bg = Image.composite(Image.new("RGB", (W, H), (120, 105, 95)), bg, sh)
+d.polygon([(0, 0), (480, 0), (140, H)], fill=70)
+d.polygon([(640, 0), (760, 0), (420, H)], fill=34)
+d.polygon([(1750, 0), (W, 0), (W, 560)], fill=50)
+sh = sh.filter(ImageFilter.GaussianBlur(110))
+bg = Image.composite(Image.new("RGB", (W, H), (112, 98, 88)), bg, sh)
+# window light falling diagonally across the surface
+lt = Image.new("L", (W, H), 0)
+ld = ImageDraw.Draw(lt)
+ld.polygon([(480, 0), (640, 0), (300, H), (140, H)], fill=120)
+ld.polygon([(760, 0), (1100, 0), (760, H), (420, H)], fill=70)
+ld.polygon([(1100, 0), (1750, 0), (W, 560), (W, 900), (1500, 0)], fill=40)
+lt = lt.filter(ImageFilter.GaussianBlur(90))
+bg = Image.composite(Image.new("RGB", (W, H), (236, 227, 216)), bg, lt.point(lambda v: int(v * .55)))
 canvas = bg.convert("RGBA")
 
 
@@ -52,6 +61,24 @@ def tablet(screen, height, angle):
     dev = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     ImageDraw.Draw(dev).rounded_rectangle((0, 0, w - 1, h - 1), radius=int(pad * 2.2), fill=(14, 14, 14, 255))
     ImageDraw.Draw(dev).rounded_rectangle((3, 3, w - 4, h - 4), radius=int(pad * 2.2), outline=(95, 92, 90, 255), width=3)
+    # bezel shading: slightly lifted toward the light (top-left)
+    bz = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    bzd = ImageDraw.Draw(bz)
+    for i in range(0, w + h, 4):
+        k = max(0, 1 - i / (w + h) * 2.2)
+        bzd.line([(i, 0), (0, i)], fill=(255, 255, 255, int(26 * k)), width=5)
+    bzm = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(bzm).rounded_rectangle((0, 0, w - 1, h - 1), radius=int(pad * 2.2), fill=255)
+    dev.paste(bz, (0, 0), Image.composite(bz.split()[3], Image.new("L", (w, h), 0), bzm))
+    # rim light on the top-left metal edge, falling off to the bottom-right
+    rim = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    ImageDraw.Draw(rim).rounded_rectangle((1, 1, w - 2, h - 2), radius=int(pad * 2.2), outline=(214, 208, 202, 255), width=3)
+    fade = Image.new("L", (w, h), 0)
+    fd = ImageDraw.Draw(fade)
+    for i in range(0, w + h, 4):
+        fd.line([(i, 0), (0, i)], fill=int(255 * max(0, 1 - i / (w + h) * 1.6)), width=5)
+    rim.putalpha(Image.composite(rim.split()[3], Image.new("L", (w, h), 0), fade))
+    dev.alpha_composite(rim)
     dev.paste(scr, (pad, pad), m)
     gl = Image.new("RGBA", (sw, sh_), (0, 0, 0, 0))
     gd = ImageDraw.Draw(gl)
@@ -62,16 +89,21 @@ def tablet(screen, height, angle):
     return dev.rotate(angle, resample=Image.BICUBIC, expand=True)
 
 
+def drop(shape_alpha, x, y, layers):
+    """Composite layered shadows (offset_x, offset_y, blur, opacity) under a shape."""
+    global canvas
+    for ox, oy, blur, op in layers:
+        shd = Image.new("RGBA", shape_alpha.size, (46, 32, 24, 0))
+        shd.putalpha(shape_alpha.point(lambda v, op=op: int(v * op)))
+        lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        lay.paste(shd, (x + ox, y + oy), shd)
+        canvas = Image.alpha_composite(canvas, lay.filter(ImageFilter.GaussianBlur(blur)))
+
+
 def place(dev, cx, cy):
     global canvas
     x, y = int(cx - dev.width / 2), int(cy - dev.height / 2)
-    a = dev.split()[3]
-    shadow = Image.new("RGBA", dev.size, (40, 28, 20, 0))
-    shadow.putalpha(a.point(lambda v: int(v * 0.55)))
-    layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    layer.paste(shadow, (x + 30, y + 50), shadow)
-    layer = layer.filter(ImageFilter.GaussianBlur(38))
-    canvas = Image.alpha_composite(canvas, layer)
+    drop(dev.split()[3], x, y, [(90, 130, 80, .26), (34, 52, 30, .34), (10, 16, 9, .5), (3, 5, 3, .55)])
     canvas.alpha_composite(dev, (x, y))
 
 
@@ -94,9 +126,7 @@ pd.polygon([(850, 4), (900, 15), (850, 26)], fill=(232, 228, 222, 255))
 pd.polygon([(888, 12), (900, 15), (888, 18)], fill=(60, 56, 54, 255))
 pd.rectangle((120, 5, 720, 7), fill=(255, 255, 255, 255))
 pen = pen.rotate(-80, expand=True, resample=Image.BICUBIC)
-sh_p = Image.new("RGBA", pen.size, (30, 20, 14, 0)); sh_p.putalpha(pen.split()[3].point(lambda v: int(v * .85)))
-lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); lay.paste(sh_p, (418, 768), sh_p)
-canvas = Image.alpha_composite(canvas, lay.filter(ImageFilter.GaussianBlur(9)))
+drop(pen.split()[3], 380, 720, [(36, 52, 22, .30), (14, 20, 7, .45), (4, 6, 3, .6)])
 canvas.alpha_composite(pen, (380, 720))
 
 
@@ -192,9 +222,7 @@ sd.text((sc, sc - 28), "+1000", font=tf, fill=cream, anchor="mm")
 spaced(sd, (sc, sc + 28), "STICKERS", sf, cream, 5)
 sd.line([(sc - 70, sc + 18), (sc + 70, sc + 18)], fill=cream, width=2)
 seal = seal.rotate(10, expand=True, resample=Image.BICUBIC)
-shd = Image.new("RGBA", seal.size, (50, 35, 25, 0)); shd.putalpha(seal.split()[3].point(lambda v: int(v * .45)))
-lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); lay.paste(shd, (sx - seal.width // 2 + 8, sy - seal.height // 2 + 14), shd)
-canvas = Image.alpha_composite(canvas, lay.filter(ImageFilter.GaussianBlur(10)))
+drop(seal.split()[3], sx - seal.width // 2, sy - seal.height // 2, [(30, 46, 22, .3), (10, 16, 8, .45), (3, 5, 3, .55)])
 canvas.alpha_composite(seal, (sx - seal.width // 2, sy - seal.height // 2))
 
 d = ImageDraw.Draw(canvas)
