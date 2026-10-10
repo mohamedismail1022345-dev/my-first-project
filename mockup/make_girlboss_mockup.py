@@ -81,10 +81,10 @@ GOLD = (180, 133, 53, 255)
 if os.path.exists(COVER):
     # the clean cover supplied by the author (no stylus, nothing hidden)
     cv_raw = Image.open(COVER).convert("RGB")                      # 539 x 716
-    cv_raw = cv_raw.crop((1, 0, 538, cv_raw.height))               # exactly 3:4 like the screens
+    cv_raw = cv_raw.crop((2, 1, cv_raw.width, cv_raw.height))      # trims the dark screenshot border on the left/top; ~3:4 like the screens
     K2 = 2
     cover = cv_raw.resize((cv_raw.width * K2, cv_raw.height * K2), Image.LANCZOS)
-    YEAR_CX, YEAR_CY, YEAR_BOX = 272 * K2, 212 * K2, (232 * K2, 200 * K2, 314 * K2, 224 * K2)
+    YEAR_CX, YEAR_CY, YEAR_BOX = 268 * K2, 211 * K2, (243 * K2, 202 * K2, 295 * K2, 221 * K2)
 else:
     # provisional: crop the visible part of the cover from the original and paint the stylus out
     FB = (175, 664, 953, 1701)                                     # 778 x 1037 = 3:4
@@ -103,7 +103,7 @@ def cover_year(img, text="2026 - 2027"):
     """Replace the gold '2027' above the title with '2026 - 2027' (same colour, quiet serif, same spacing)."""
     x0, y0, x1, y1 = YEAR_BOX
     m = np.zeros((img.height, img.width), bool); m[y0:y1, x0:x1] = True
-    img = fill_region(img, m, 12 * K2, 12 * K2)
+    img = fill_region(img, m, 7 * K2, 7 * K2)
     k = 4
     layer = Image.new("RGBA", (img.width * k, img.height * k), (0, 0, 0, 0)); ld = ImageDraw.Draw(layer)
     f = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf", int(17.5 * (K2 if K2 > 1 else 1.45) * k))
