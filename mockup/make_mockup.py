@@ -9,6 +9,39 @@ W, H = 2400, 1800
 src = Image.open(SRC).convert("RGB")
 daily = src.crop((667, 398, 1143, 1070))   # screen only, bezel removed
 cover = src.crop((111, 395, 598, 1080))
+
+
+def cover_year(img, text="2026 - 2027"):
+    """Replace the single '2027' on the cover with the two-year range, in the same quiet serif."""
+    img = img.copy()
+    cx, y0, y1 = 243, 276, 342                      # centre x and band that holds the divider lines + year
+    pw = 150
+    patch = img.crop((330, y0, 330 + pw, y1))        # clean paper from the same row, right of the text
+    fm = Image.new("L", (pw, y1 - y0), 255).filter(ImageFilter.GaussianBlur(0))
+    edge = Image.new("L", (pw, y1 - y0), 0)
+    ImageDraw.Draw(edge).rectangle((6, 6, pw - 7, y1 - y0 - 7), fill=255)
+    edge = edge.filter(ImageFilter.GaussianBlur(4))
+    img.paste(patch, (cx - pw // 2, y0), edge)
+    k = 6
+    layer = Image.new("RGBA", (img.width * k, img.height * k), (0, 0, 0, 0))
+    ld = ImageDraw.Draw(layer)
+    line_col = (196, 168, 138, 255)
+    half = 40
+    for yy in (286, 334):                             # divider lines, widened to suit the longer text
+        ld.rectangle(((cx - half) * k, yy * k, (cx + half) * k, (yy + 1) * k), fill=line_col)
+    f = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf", 19 * k)
+    tr = 4.2 * k
+    widths = [ld.textlength(c, font=f) for c in text]
+    x = cx * k - (sum(widths) + tr * (len(text) - 1)) / 2
+    for c, w in zip(text, widths):
+        ld.text((x, 322 * k), c, font=f, fill=(78, 60, 50, 255), anchor="ls")
+        x += w + tr
+    layer = layer.resize(img.size, Image.LANCZOS)
+    img = img.convert("RGBA"); img.alpha_composite(layer)
+    return img.convert("RGB")
+
+
+cover = cover_year(cover)
 # the four app icons from the original mockup: Apple Calendar, Reminders, Google Calendar, ChatGPT
 icon_acal = src.crop((485, 302, 547, 362))
 icon_rem = src.crop((559, 302, 621, 362))
