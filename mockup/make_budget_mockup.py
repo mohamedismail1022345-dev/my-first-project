@@ -1,18 +1,20 @@
 """Builds the BUDGET planner listing mockup (2400x1800), same style as make_mockup.py.
-Usage: python3 make_budget_mockup.py <budget_source.jpg> <icons_source.webp> <out.png>
-<budget_source> supplies the cover + daily page (the pencil lying on it is painted out);
-<icons_source> is the ADHD mockup image, used only for the four app icons."""
+Usage: python3 make_budget_mockup.py <budget_source.jpg> <out.png>
+<budget_source> is the original 2000x2000 Budget mockup: it supplies the cover, the daily page
+and the four app icons. The stylus lying on it is painted out and the schedule's hidden time
+labels (5-9 AM) are re-typeset, so every entry on the page stays visible."""
 import sys
 import math
 import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
-SRC, ICONS, OUT = sys.argv[1], sys.argv[2], sys.argv[3]
+SRC, OUT = sys.argv[1], sys.argv[2]
 W, H = 2400, 1800
 src = Image.open(SRC).convert("RGB")
-icons_src = Image.open(ICONS).convert("RGB")
-COVER_BOX = (79, 218, 330, 584)     # cover screen only
-DAILY_BOX = (343, 225, 622, 592)    # daily page screen only
+COVER_BOX = (175, 620, 912, 1736)    # visible part of the cover screen (the daily tablet's shadow starts at ~915)
+COVER_FULL_W = 797                   # real cover width: centred on its text (x=572.5), left edge x=175
+DAILY_BOX = (985, 642, 1825, 1758)   # daily page screen only
+TIP, END = np.array([707.0, 1775.5]), np.array([1056.7, 943.3])   # the stylus lying on the original
 
 
 def _k(sigma):
@@ -31,14 +33,15 @@ def _conv(a, k, axis):
     return out
 
 
-def fill_region(img, mask, sx, sy, ink=None, grain=0.0, seed=1):
-    """Paint `mask` (bool array, True = unknown) from the surrounding known pixels (normalised convolution)."""
+def fill_region(img, mask, sx, sy, ink=None, tex=None):
+    """Paint `mask` (True = unknown) from the surrounding known pixels (normalised convolution).
+    `tex` is an optional high-pass paper-grain array that is tiled over the filled pixels."""
     a = np.asarray(img.convert("RGB"), float)
     known = (~mask).astype(float)
     if ink is not None:
         known *= (a.mean(2) >= ink)
-    res = None
-    for sxx, syy in ((sx, sy), (sx * 4, sy * 4), (40, 40)):
+    res, ok = None, None
+    for sxx, syy in ((sx, sy), (sx * 4, sy * 4), (60, 60)):
         num = a * known[..., None]; den = known.copy()
         for axis, sg in ((1, sxx), (0, syy)):
             k = _k(sg)
@@ -48,46 +51,58 @@ def fill_region(img, mask, sx, sy, ink=None, grain=0.0, seed=1):
             res, ok = f, den > 0.05
         else:
             res = np.where(ok[..., None], res, f); ok = ok | (den > 0.05)
-    out = a.copy()
-    rng = np.random.default_rng(seed)
-    noise = rng.normal(0, grain, a.shape[:2])[..., None] if grain else 0
-    soft = _conv(_conv(mask.astype(float), _k(1.2), 0), _k(1.2), 1)[..., None]   # feather the edge
-    out = out * (1 - soft) + (res + noise) * soft
+    if tex is not None:
+        th, tw = tex.shape
+        yy = (np.arange(a.shape[0])[:, None] + 7) % th; xx = (np.arange(a.shape[1])[None, :] + 13) % tw
+        res = res + tex[yy, xx][..., None]
+    soft = _conv(_conv(mask.astype(float), _k(1.5), 0), _k(1.5), 1)[..., None]   # feather the edge
+    out = a * (1 - soft) + res * soft
     return Image.fromarray(np.clip(out, 0, 255).astype("uint8"))
 
 
-def pencil_mask(size, box, hl=17, hr=11, ext=7):
-    """Mask of the stylus lying across the source mockup (tip (252.5, 597.5) -> end (370, 326)), cropped to `box`."""
-    tip, end = np.array([252.5, 597.5]), np.array([370.0, 326.0])
-    u = (end - tip) / np.linalg.norm(end - tip); n = np.array([-u[1], u[0]])
+def pencil_mask(size, box, hl=48, hr=26, ext=6):
+    """Mask of the stylus (and its soft shadow, mostly on the left) cropped to `box`."""
+    u = (END - TIP) / np.linalg.norm(END - TIP); n = np.array([-u[1], u[0]])
     n = n if n[0] > 0 else -n
-    p0, p1 = tip - u * 4, end + u * ext
+    p0, p1 = TIP - u * 10, END + u * ext
     poly = [tuple(p0 - n * hl), tuple(p1 - n * hl), tuple(p1 + n * hr), tuple(p0 + n * hr)]
     m = Image.new("L", size, 0); ImageDraw.Draw(m).polygon(poly, fill=255)
     return np.asarray(m.crop(box)) > 0
 
 
+# paper grain, measured on a clean patch of the cover, re-used to texture everything we repaint there
+_clean = np.asarray(src.crop((220, 650, 560, 900)).convert("L"), float)
+_bl = np.asarray(Image.fromarray(_clean.astype("uint8")).filter(ImageFilter.GaussianBlur(3)), float)
+GRAIN = _clean - _bl
+
+# ---- cover: take the stylus off, extend the strip hidden behind the daily tablet, show the two-year range
 cover = src.crop(COVER_BOX)
-daily = src.crop(DAILY_BOX)
-# take the pencil off both screens
-cover = fill_region(cover, pencil_mask(src.size, COVER_BOX), 6, 6, grain=2.2)
-daily = fill_region(daily, pencil_mask(src.size, DAILY_BOX, hl=14, hr=6, ext=1), 4, 0.9, ink=226)
+cover = fill_region(cover, pencil_mask(src.size, COVER_BOX), 14, 14, tex=GRAIN)
+extra = COVER_FULL_W - cover.width
+cover_full = Image.new("RGB", (COVER_FULL_W, cover.height))
+cover_full.paste(cover, (0, 0))
+cover_full.paste(cover.crop((cover.width - extra, 0, cover.width, cover.height)).transpose(Image.FLIP_LEFT_RIGHT), (cover.width, 0))
+cover = cover_full
 
 
 def cover_year(img, text="2026 - 2027"):
-    """Replace the single '2027' on the cover with the two-year range, in the same quiet serif."""
-    cx, cy = 130, 164                                   # centre of the old year (cover-crop coordinates)
-    m = np.zeros((img.height, img.width), bool); m[cy - 8:cy + 9, cx - 22:cx + 23] = True
-    img = fill_region(img, m, 5, 5, grain=2.2, seed=3)
-    k = 8
+    """Replace the single '2027' (and its two thin rules) on the cover with the two-year range."""
+    ox, oy = COVER_BOX[0], COVER_BOX[1]
+    cx = 572.5 - ox                                  # centre of the cover text column
+    m = np.zeros((img.height, img.width), bool)
+    m[1066 - oy:1170 - oy, int(cx) - 140:int(cx) + 141] = True
+    img = fill_region(img, m, 10, 10, tex=GRAIN)
+    k = 6
     layer = Image.new("RGBA", (img.width * k, img.height * k), (0, 0, 0, 0))
     ld = ImageDraw.Draw(layer)
-    f = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf", 9 * k)
-    tr = 2.0 * k
+    for yy in (1079, 1155):                          # the two thin rules, widened to suit the longer text
+        ld.rectangle(((cx - 118) * k, (yy - oy) * k, (cx + 118) * k, (yy - oy + 1.4) * k), fill=(204, 178, 150, 255))
+    f = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf", int(25 * k))
+    tr = 9 * k
     widths = [ld.textlength(c, font=f) for c in text]
     x = cx * k - (sum(widths) + tr * (len(text) - 1)) / 2
     for c, w in zip(text, widths):
-        ld.text((x, (cy + 3.4) * k), c, font=f, fill=(104, 84, 70, 255), anchor="ls")
+        ld.text((x, (1131 - oy) * k), c, font=f, fill=(96, 76, 64, 255), anchor="ls")
         x += w + tr
     layer = layer.resize(img.size, Image.LANCZOS)
     img = img.convert("RGBA"); img.alpha_composite(layer)
@@ -95,11 +110,29 @@ def cover_year(img, text="2026 - 2027"):
 
 
 cover = cover_year(cover)
-# the four app icons, same artwork as the ADHD mockup: Apple Calendar, Reminders, Google Calendar, ChatGPT
-icon_acal = icons_src.crop((485, 302, 547, 362))
-icon_rem = icons_src.crop((559, 302, 621, 362))
-icon_gcal = icons_src.crop((635, 302, 697, 362))
-icon_gpt = icons_src.crop((709, 302, 771, 362))
+
+# ---- daily page: take the stylus off, then re-typeset the schedule time labels it was hiding (5-9 AM)
+daily = src.crop(DAILY_BOX)
+dmask = pencil_mask(src.size, DAILY_BOX, hl=30, hr=24, ext=6)
+dmask[940 - DAILY_BOX[1]:1058 - DAILY_BOX[1], 1026 - DAILY_BOX[0]:1066 - DAILY_BOX[0]] = True   # label column, rows 5-9 AM
+daily = fill_region(daily, dmask, 6, 0.9, ink=232)
+_k8 = 8
+_lay = Image.new("RGBA", (daily.width * _k8, daily.height * _k8), (0, 0, 0, 0))
+_ld = ImageDraw.Draw(_lay)
+_lf = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf", int(8.2 * _k8))
+for i, t in enumerate(["5 AM", "6 AM", "7 AM", "8 AM", "9 AM"]):
+    xx = (1031.7 - DAILY_BOX[0]) * _k8
+    for ch in t:
+        _ld.text((xx, (955 + 24 * i - DAILY_BOX[1]) * _k8), ch, font=_lf, fill=(150, 144, 138, 235), anchor="ls")
+        xx += _ld.textlength(ch, font=_lf) + 1.0 * _k8
+_lay = _lay.resize(daily.size, Image.LANCZOS)
+daily = daily.convert("RGBA"); daily.alpha_composite(_lay); daily = daily.convert("RGB")
+
+# the four app icons straight from the original (Apple Calendar, Reminders, Google Calendar, ChatGPT)
+icon_acal = src.crop((778, 478, 870, 570))
+icon_rem = src.crop((895, 478, 987, 570))
+icon_gcal = src.crop((1013, 478, 1105, 570))
+icon_gpt = src.crop((1131, 478, 1223, 570))
 
 F = "/usr/share/fonts/truetype/"
 serif = F + "liberation/LiberationSerif-Regular.ttf"
@@ -178,10 +211,9 @@ def tablet(screen, height, angle):
     pad = int(height * 0.028)
     sh_ = height - 2 * pad
     sw = int(screen.width * sh_ / screen.height)
-    scr = screen.resize((sw, sh_), Image.BICUBIC)
-    # low-resolution source (~3x upscale): keep it natural, only a gentle unsharp so text is not crunchy
-    scr = scr.filter(ImageFilter.UnsharpMask(radius=2.6, percent=75, threshold=2))
-    scr = ImageEnhance.Contrast(scr).enhance(1.05)
+    scr = screen.resize((sw, sh_), Image.LANCZOS)
+    # high-resolution source: resample cleanly, only a light unsharp to keep small print crisp
+    scr = scr.filter(ImageFilter.UnsharpMask(radius=1.1, percent=55, threshold=2))
     w, h = sw + 2 * pad, height
     m = Image.new("L", (sw, sh_), 0)
     ImageDraw.Draw(m).rounded_rectangle((0, 0, sw - 1, sh_ - 1), radius=int(pad * 1.1), fill=255)
