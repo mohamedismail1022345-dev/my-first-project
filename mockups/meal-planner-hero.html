@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Meal Planner Hero Mockup</title>
+<meta name="viewport" content="width=2000">
+<style>
+@font-face{font-family:"Cormorant";font-weight:400;src:url(assets/fonts/cormorant-garamond-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Cormorant";font-weight:500;src:url(assets/fonts/cormorant-garamond-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:"Montserrat";font-weight:300;src:url(assets/fonts/montserrat-latin-300-normal.woff2) format("woff2")}
+@font-face{font-family:"Montserrat";font-weight:400;src:url(assets/fonts/montserrat-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Sacramento";font-weight:400;src:url(assets/fonts/sacramento-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Caveat";font-weight:400;src:url(assets/fonts/caveat-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Caveat";font-weight:600;src:url(assets/fonts/caveat-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Jost";font-weight:300;src:url(assets/fonts/jost-latin-300-normal.woff2) format("woff2")}
+@font-face{font-family:"Jost";font-weight:400;src:url(assets/fonts/jost-latin-400-normal.woff2) format("woff2")}
+
+:root{
+  --ink:#4A3626; --ink-soft:#6B5645; --brown:#6E4331; --script:#8A5A3C;
+  --tan:#B7A08B; --card:#EEE4DB; --line:#D8CDC3; --paper:#FBF8F3; --tab:#A98B78;
+  --hand:#3F3029;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:2000px;height:2000px;overflow:hidden;background:#E8DED6}
+
+.canvas{position:relative;width:2000px;height:2000px;overflow:hidden;
+  background:
+    radial-gradient(60% 46% at 48% 2%, rgba(255,253,250,.95), rgba(255,253,250,0) 62%),
+    radial-gradient(50% 42% at 86% 26%, rgba(255,252,248,.60), rgba(255,252,248,0) 68%),
+    linear-gradient(163deg,#EFE7E0 0%,#E8DED6 28%,#DFD4CB 56%,#CFC0B5 100%)}
+.blob{position:absolute;border-radius:50%;filter:blur(100px)}
+.sweep{position:absolute;left:-300px;top:-200px;width:1100px;height:2600px;transform:rotate(-24deg);
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.22) 40%,rgba(255,255,255,.06) 70%,rgba(255,255,255,0))}
+.sweep.b{left:420px;width:520px;opacity:.55}
+.grain{position:absolute;inset:0;opacity:.22;mix-blend-mode:soft-light;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .4  0 0 0 0 .3  0 0 0 0 .25  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.vignette{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(85% 80% at 50% 45%, rgba(0,0,0,0) 62%, rgba(86,62,46,.16) 100%)}
+
+/* ---------- headline ---------- */
+.title{position:absolute;left:0;right:0;top:96px;text-align:center;font-family:"Cormorant",serif;font-weight:400;
+  font-size:172px;line-height:1;letter-spacing:.115em;color:var(--brown);padding-left:.115em;
+  text-shadow:0 1px 0 rgba(255,255,255,.4)}
+.script{position:absolute;left:0;right:0;top:252px;text-align:center;font-family:"Sacramento",cursive;
+  font-size:170px;line-height:1;color:var(--script);padding-left:44px}
+.apps{position:absolute;left:0;right:0;top:468px;display:flex;justify-content:center;gap:26px;padding-left:6px}
+.apps img{width:92px;height:92px;display:block;filter:drop-shadow(0 8px 14px rgba(80,55,38,.20))}
+
+/* ---------- iPad frame ---------- */
+.ipad{position:absolute;width:880px;height:1140px;border-radius:58px;padding:28px;
+  background:linear-gradient(145deg,#37302D 0%,#171413 45%,#0B0A0A 100%);
+  box-shadow:0 0 0 3px #B6AEA9, 0 0 0 4px rgba(255,255,255,.35), 0 46px 80px rgba(60,40,28,.38), 0 14px 26px rgba(60,40,28,.28)}
+.ipad::before{content:"";position:absolute;inset:6px;border-radius:52px;border:1.5px solid rgba(255,255,255,.12);pointer-events:none}
+.screen{position:relative;width:824px;height:1084px;border-radius:32px;overflow:hidden;background:var(--paper)}
+.screen::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:32px;
+  background:linear-gradient(118deg,rgba(255,255,255,.20) 0%,rgba(255,255,255,0) 22%)}
+.ipad.left{left:96px;top:572px}
+.ipad.right{left:922px;top:592px}
+
+/* ---------- cover ---------- */
+.cover{background:
+  radial-gradient(72% 52% at 50% 40%, rgba(255,250,236,.85), rgba(255,250,236,0) 72%),
+  linear-gradient(172deg,#F8EBD2,#F3E3C4 60%,#EEDDBA)}
+.cover .paper{position:absolute;inset:0;opacity:.55;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='3' seed='7'/><feColorMatrix values='0 0 0 0 .78  0 0 0 0 .62  0 0 0 0 .40  0 0 0 .35 0'/></filter><rect width='100%' height='100%' filter='url(%23p)'/></svg>"),
+  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='q'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 .55  0 0 0 0 .40  0 0 0 0 .22  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23q)'/></svg>")}
+.cover .ctitle{position:absolute;left:0;right:0;top:372px;text-align:center;font-family:"Cormorant",serif;font-size:84px;
+  letter-spacing:.3em;padding-left:.3em;color:#5C3F2D}
+.cover .csub{position:absolute;left:0;right:0;top:488px;text-align:center;font-family:"Jost",sans-serif;font-weight:400;
+  font-size:14px;letter-spacing:.7em;padding-left:.7em;color:#6E5645}
+.cover .crule{position:absolute;left:50%;top:536px;width:54px;height:1px;background:#8A7060;transform:translateX(-50%)}
+.cover .cyear{position:absolute;left:0;right:0;top:556px;text-align:center;font-family:"Cormorant",serif;font-size:30px;
+  letter-spacing:.34em;padding-left:.34em;color:#5C3F2D}
+.cover .crule2{top:608px}
+.cover .csprig{position:absolute;left:50%;top:640px;width:84px;transform:translateX(-50%)}
+.cover .ctag{position:absolute;left:0;right:0;top:790px;text-align:center;font-family:"Jost",sans-serif;font-size:11.5px;
+  letter-spacing:.34em;padding-left:.34em;color:#6E5645}
+.cover .cbtn{position:absolute;left:50%;bottom:62px;transform:translateX(-50%);padding:10px 36px;border:1px solid #8A7060;
+  border-radius:30px;font-family:"Jost",sans-serif;font-size:10.5px;letter-spacing:.3em;padding-left:calc(36px + .3em);color:#6E5645}
+
+/* ---------- planner page ---------- */
+.page{position:absolute;inset:0;font-family:"Jost",sans-serif;color:var(--ink)}
+.caps{font-family:"Jost",sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:.2em;font-size:9.5px;color:var(--ink-soft)}
+.hand{font-family:"Caveat",cursive;color:var(--hand);font-size:17.5px;line-height:1}
+.topicons{position:absolute;left:44px;top:20px;display:flex;gap:14px}
+.topicons svg{width:17px;height:17px;stroke:#A98B6A;fill:none;stroke-width:1.2}
+.nav{position:absolute;right:62px;top:22px;display:flex;gap:17px}
+.nav span{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:#8C7766;font-weight:400}
+.head{position:absolute;left:44px;right:62px;top:62px;height:44px}
+.head .sprigsm{position:absolute;left:0;top:2px;width:15px}
+.head h1{position:absolute;left:30px;top:2px;font-family:"Cormorant",serif;font-weight:400;font-size:31px;letter-spacing:.1em;color:var(--ink);white-space:nowrap}
+.head .links{position:absolute;right:0;top:12px;font-size:8px;letter-spacing:.2em;color:#8C7766;text-transform:uppercase;white-space:nowrap}
+.strip{position:absolute;left:44px;right:62px;top:114px;height:50px;border-top:0}
+.strip .rule{position:absolute;left:0;right:0;top:0;height:1px;background:#BFAE9F}
+.days{position:absolute;left:0;right:0;top:8px;display:flex;justify-content:space-between}
+.day{width:24px;text-align:center;font-size:7px;color:#8C7766;letter-spacing:.06em}
+.day b{display:block;font-weight:300;font-size:9px;margin-top:6px;color:#6B5645;width:19px;height:19px;line-height:19px;margin-left:2.5px;border-radius:50%}
+.day.on b{background:#A98B78;color:#fff;font-weight:400}
+
+.cards{position:absolute;left:44px;right:62px;top:182px;display:flex;gap:16px}
+.card{flex:1;height:96px;background:var(--card);border-radius:3px;text-align:center;padding-top:14px}
+.card .lab{font-family:"Sacramento",cursive;font-size:21px;color:var(--tan);line-height:1}
+.card .val{margin-top:12px;font-size:20px}
+.radios{display:flex;gap:16px;justify-content:center;margin-top:8px;font-size:6.5px;letter-spacing:.2em;color:#9B8777;text-transform:uppercase}
+.radios i{display:inline-block;width:8px;height:8px;border:1px solid #9B8777;border-radius:50%;vertical-align:-2px;margin-right:4px}
+.radios i.f{background:#6E4331;border-color:#6E4331}
+
+.col{position:absolute;top:298px}
+.col.l{left:44px;width:338px;height:738px;display:flex;flex-direction:column}
+.col.r{left:404px;width:358px}
+.sec{display:flex;align-items:center;gap:7px;height:20px;border-bottom:1.3px solid #6B5645;margin-bottom:0}
+.sec svg{width:10px;height:10px;stroke:#8C7766;fill:none;stroke-width:1.3}
+.sec .caps{font-weight:400;color:#4A3626;font-size:9.3px}
+.sec .aside{margin-left:auto;font-size:7.5px;letter-spacing:.2em;color:#8C7766;text-transform:uppercase}
+.mealhd{height:19px;display:flex;align-items:flex-end;padding-bottom:2px;font-size:7.8px;letter-spacing:.24em;color:#A08B7A;text-transform:uppercase;border-bottom:1px solid var(--line)}
+.row{height:26px;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;padding:0 0 3px 46px;position:relative}
+.row .tm{position:absolute;left:4px;bottom:4px;font-size:7.5px;letter-spacing:.14em;color:#A08B7A;text-transform:uppercase}
+.notes-rows .row{padding-left:4px}
+.row.shade{background:rgba(238,228,219,.55)}
+.todo{height:26px;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;padding:0 0 3px 0;position:relative}
+.cb{position:absolute;left:0;bottom:6px;width:11px;height:11px;border:1px solid #8C7766;border-radius:50%}
+.cb.s{border-radius:2px}
+.cb.on::after{content:"";position:absolute;left:3px;top:0px;width:3px;height:7px;border:solid #3F3029;border-width:0 1.4px 1.4px 0;transform:rotate(40deg)}
+.todo .hand{margin-left:22px}
+
+table.g{width:100%;border-collapse:collapse;table-layout:fixed}
+table.g th{height:20px;text-align:left;font-weight:400;font-size:7.5px;letter-spacing:.2em;color:#4A3626;border-bottom:1.3px solid #6B5645;text-transform:uppercase;padding-left:6px}
+table.g th.c,table.g td.c{text-align:center;padding-left:0}
+table.g td{height:28px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:0 0 3px 6px;vertical-align:bottom}
+table.g td:last-child{border-right:0}
+.box{display:inline-block;width:10px;height:10px;border:1px solid #8C7766;border-radius:2px;position:relative;vertical-align:-1px;margin-bottom:6px}
+.box.on::after{content:"";position:absolute;left:2.5px;top:-1px;width:3.5px;height:7px;border:solid #3F3029;border-width:0 1.4px 1.4px 0;transform:rotate(40deg)}
+.total{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px;font-size:7.5px;letter-spacing:.2em;color:#4A3626;text-transform:uppercase}
+.total .ul{width:78px;height:1px;background:#8C7766;margin-top:8px}
+.quote{margin-top:14px;height:54px;background:var(--card);border-radius:3px;display:flex;align-items:center;justify-content:center;
+  font-family:"Sacramento",cursive;font-size:28px;color:var(--tan)}
+.notes .hand{font-size:17.5px}
+
+.checkin{margin-top:auto}
+.checkin .ci{display:flex;gap:30px;margin-top:11px;font-size:7.5px;letter-spacing:.2em;color:#8C7766;text-transform:uppercase}
+.checkin .ci .box{margin:0 7px 0 0;vertical-align:-2px}
+.checkin .mood{margin-top:14px;display:flex;align-items:center;gap:13px;font-size:6.5px;letter-spacing:.2em;color:#9B8777;text-transform:uppercase}
+.checkin .mood i{display:inline-block;width:8px;height:8px;border:1px solid #9B8777;border-radius:50%;vertical-align:-2px;margin-right:4px}
+.checkin .mood i.f{background:#6E4331;border-color:#6E4331}
+
+.tabs{position:absolute;right:0;top:112px;width:44px}
+.tab{height:77px;margin-bottom:2px;background:#EFE6DE;border-radius:10px 0 0 10px;width:38px;margin-left:6px;display:flex;align-items:center;justify-content:center;
+  font-size:8.5px;letter-spacing:.24em;color:#AD9987;writing-mode:vertical-rl;text-transform:uppercase}
+.tab.on{background:var(--tab);color:#fff;width:44px;margin-left:0}
+.foot{position:absolute;left:44px;right:62px;bottom:16px;display:flex;justify-content:space-between;font-size:7px;letter-spacing:.2em;color:#8C7766;text-transform:uppercase}
+
+/* ---------- stickers ---------- */
+.stk{position:absolute;filter:drop-shadow(0 6px 8px rgba(70,50,34,.22))}
+
+/* ---------- pencil ---------- */
+.pencil{position:absolute;left:848px;top:950px;width:34px;height:807px;transform:rotate(24.1deg);z-index:10;
+  filter:drop-shadow(8px 16px 14px rgba(50,35,25,.34))}
+.pencil .body{position:absolute;inset:0;border-radius:17px 17px 0 0;
+  background:linear-gradient(90deg,#CFCBC6 0%,#F4F2EF 22%,#FFFFFF 50%,#F1EEEA 78%,#CBC6C0 100%);
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 78px),63% calc(100% - 16px),37% calc(100% - 16px),0 calc(100% - 78px))}
+.pencil .nib{position:absolute;left:50%;bottom:0;width:11px;height:18px;transform:translateX(-50%);
+  background:linear-gradient(90deg,#4A4543,#8A8480 50%,#4A4543);clip-path:polygon(0 0,100% 0,62% 100%,38% 100%)}
+.pencil .band{position:absolute;left:0;right:0;top:34px;height:1px;background:rgba(0,0,0,.06)}
+
+/* ---------- footer brand ---------- */
+.brand{position:absolute;left:0;right:0;top:1766px;text-align:center}
+.brand svg{width:44px;height:44px;display:block;margin:0 auto 12px;stroke:#8A5A3C;fill:none;stroke-width:1.3}
+.brand div{font-family:"Jost",sans-serif;font-weight:300;font-size:58px;letter-spacing:.46em;padding-left:.46em;color:#6B5A52}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="sprig" viewBox="0 0 60 110">
+      <g fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M30 108C30 80 30 46 30 8"/>
+        <path d="M30 94C20 90 13 82 12 72C22 74 29 83 30 94Z"/>
+        <path d="M30 94C40 90 47 82 48 72C38 74 31 83 30 94Z"/>
+        <path d="M30 72C19 68 12 59 11 49C22 51 29 60 30 72Z"/>
+        <path d="M30 72C41 68 48 59 49 49C38 51 31 60 30 72Z"/>
+        <path d="M30 50C21 46 16 38 15 29C24 31 29 39 30 50Z"/>
+        <path d="M30 50C39 46 44 38 45 29C36 31 31 39 30 50Z"/>
+        <path d="M30 30C25 26 23 19 24 12C28 15 30 22 30 30Z"/>
+        <path d="M30 30C35 26 37 19 36 12C32 15 30 22 30 30Z"/>
+        <path d="M30 8C27 5 27 2 30 0C33 2 33 5 30 8Z"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="canvas">
+  <!-- backdrop -->
+  <div class="blob" style="left:-160px;top:380px;width:640px;height:640px;background:rgba(122,84,60,.12)"></div>
+  <div class="blob" style="right:-200px;top:140px;width:700px;height:700px;background:rgba(255,252,246,.70)"></div>
+  <div class="blob" style="left:520px;top:1500px;width:900px;height:520px;background:rgba(110,72,50,.11)"></div>
+  <div class="blob" style="right:-120px;bottom:-120px;width:620px;height:620px;background:rgba(130,90,64,.13)"></div>
+  <div class="sweep"></div><div class="sweep b"></div>
+
+  <!-- headline -->
+  <div class="title">MEAL</div>
+  <div class="script">planner</div>
+  <div class="apps">
+    <img src="assets/app-calendar.png" alt="">
+    <img src="assets/app-reminders.png" alt="">
+    <img src="assets/app-gcal.png" alt="">
+    <img src="assets/app-chatgpt.png" alt="">
+  </div>
+
+  <!-- left iPad : cover -->
+  <div class="ipad left">
+    <div class="screen cover">
+      <div class="paper"></div>
+      <div class="ctitle">MEAL</div>
+      <div class="csub">PLANNER</div>
+      <div class="crule"></div>
+      <div class="cyear">2027</div>
+      <div class="crule crule2"></div>
+      <svg class="csprig" viewBox="0 0 60 110" style="color:#B58B5E;height:123px;width:67px"><use href="#sprig"/></svg>
+      <div class="ctag">A CALM SYSTEM FOR YOUR TABLE</div>
+      <div class="cbtn">OPEN PLANNER</div>
+    </div>
+  </div>
+
+  <!-- right iPad : daily page -->
+  <div class="ipad right">
+    <div class="screen">
+      <div class="page" id="page">
+        <div class="topicons">
+          <svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="4"/><circle cx="10" cy="10" r="3"/></svg>
+          <svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="13" rx="2"/><path d="M3 8h14M7 2.5v3M13 2.5v3M7.5 12l2 2 3.5-4"/></svg>
+          <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M10 3v14M3 10h14"/></svg>
+        </div>
+        <div class="nav"><span>Index</span><span>Year</span><span>Goals</span><span>Meals</span><span>Groceries</span><span>Recipes</span><span>Pantry</span><span>Notes</span></div>
+
+        <div class="head">
+          <svg class="sprigsm" viewBox="0 0 60 110" style="color:#C9AE86;height:27px;width:15px"><use href="#sprig"/></svg>
+          <h1>MONDAY, 4 JANUARY</h1>
+          <div class="links">‹ Prev day &nbsp;·&nbsp; Month &nbsp;·&nbsp; Next day ›</div>
+        </div>
+        <div class="strip"><div class="rule"></div><div class="days" id="days"></div></div>
+
+        <div class="cards">
+          <div class="card"><div class="lab">tonight's dinner</div><div class="val hand">Lemon garlic pasta</div></div>
+          <div class="card"><div class="lab">cooking time</div><div class="val hand">25 min</div></div>
+          <div class="card"><div class="lab">meals planned</div><div class="val hand">3 of 3</div>
+            <div class="radios"><span><i class="f"></i>Home</span><span><i></i>Out</span></div></div>
+        </div>
+
+        <!-- left column -->
+        <div class="col l">
+          <div class="sec"><span class="caps">Today's menu</span></div>
+          <div id="menu"></div>
+
+          <div class="sec" style="margin-top:14px"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5"/><path d="M3.5 6.2l1.8 1.8 3.2-3.6"/></svg><span class="caps">Prep list</span></div>
+          <div id="prep"></div>
+
+          <div class="checkin">
+            <div class="sec"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5"/><path d="M3.5 6.2l1.8 1.8 3.2-3.6"/></svg><span class="caps">Daily check-in</span></div>
+            <div class="ci"><span><i class="box"></i>Meal prep day</span><span><i class="box on"></i>Cooked at home</span></div>
+            <div class="mood">FOOD MOOD
+              <span><i></i>Rushed</span><span><i></i>Meh</span><span><i></i>Okay</span><span><i class="f"></i>Tasty</span><span><i></i>Lovely</span></div>
+          </div>
+        </div>
+
+        <!-- right column -->
+        <div class="col r">
+          <table class="g">
+            <colgroup><col style="width:128px"><col style="width:96px"><col style="width:46px"><col style="width:44px"><col style="width:44px"></colgroup>
+            <thead><tr><th>Item</th><th>Aisle</th><th class="c">Qty</th><th class="c">Need</th><th class="c">Got</th></tr></thead>
+            <tbody id="groc"></tbody>
+          </table>
+          <div class="total"><span>Estimated total</span><span class="ul"></span></div>
+
+          <div class="quote">Cook once, eat twice.</div>
+
+          <div class="sec notes" style="margin-top:14px"><svg viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" rx="1.5"/><path d="M3.5 5h5M3.5 7.5h3"/></svg><span class="caps">Notes &amp; wins</span></div>
+          <div id="notes"></div>
+        </div>
+
+        <!-- stickers -->
+        <svg class="stk" style="left:232px;top:688px;width:112px;height:88px;transform:rotate(-8deg)" viewBox="0 0 122 95">
+          <rect x="6" y="14" width="100" height="68" rx="3" fill="#F7EBDD" stroke="#D8C3AE" stroke-width="1"/>
+          <path d="M6 16l50 34 50-34" fill="none" stroke="#D8C3AE" stroke-width="1"/>
+          <path d="M6 82l38-30M106 82L68 52" fill="none" stroke="#E3D1BE" stroke-width="1"/>
+          <circle cx="56" cy="52" r="10" fill="#A9573F"/><circle cx="56" cy="52" r="6.5" fill="none" stroke="#C98269" stroke-width="1"/>
+        </svg>
+
+        <svg class="stk" style="left:246px;top:756px;width:136px;height:164px;transform:rotate(-3deg)" viewBox="0 0 170 206">
+          <rect x="0" y="0" width="150" height="174" fill="#F9F4EC" stroke="#E7DCCC" stroke-width="1"/>
+          <rect x="52" y="-9" width="46" height="22" fill="#D8C1A8" opacity=".78" transform="rotate(-3 75 2)"/>
+          <rect x="12" y="20" width="126" height="118" fill="#EAD9C6"/>
+          <ellipse cx="75" cy="124" rx="48" ry="7" fill="#C9B49E" opacity=".5"/>
+          <path d="M28 82h94c0 28-20 46-47 46S28 110 28 82z" fill="#FAF3E8" stroke="#BFA68C" stroke-width="1.4"/>
+          <circle cx="52" cy="76" r="15" fill="#B9553D"/><circle cx="52" cy="76" r="15" fill="none" stroke="#9E4531" stroke-width="1"/><path d="M47 62l5 5 5-5" stroke="#6F8A4E" stroke-width="2" fill="none"/>
+          <circle cx="82" cy="70" r="13" fill="#8FA86B"/><circle cx="82" cy="70" r="7" fill="none" stroke="#6F8A4E" stroke-width="1.3"/>
+          <circle cx="108" cy="78" r="12" fill="#E6B84F"/><path d="M99 78h18M108 69v18" stroke="#CF9A32" stroke-width="1"/>
+          <circle cx="68" cy="88" r="10" fill="#C7684F"/><circle cx="96" cy="90" r="9" fill="#A9BF86"/>
+          <path d="M60 46c-4-8 4-12 0-20M82 50c-4-8 4-12 0-20M102 46c-4-8 4-12 0-20" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity=".85"/>
+          <text x="75" y="162" text-anchor="middle" font-family="Caveat" font-size="22" fill="#6B5645">sunday bowl</text>
+        </svg>
+
+        <svg class="stk" style="left:308px;top:808px;width:84px;height:78px;transform:rotate(10deg)" viewBox="0 0 96 90">
+          <circle cx="40" cy="44" r="32" fill="#F2D15B" stroke="#D9B13F" stroke-width="2"/>
+          <circle cx="40" cy="44" r="25" fill="#F8E38C"/>
+          <g stroke="#E9C65A" stroke-width="2"><path d="M40 19v50M15 44h50M22 26l36 36M58 26L22 62"/></g>
+          <circle cx="40" cy="44" r="4" fill="#F2D15B"/>
+          <path d="M66 22c12-4 22 2 26 14-12 4-22-2-26-14z" fill="#8FA86B" stroke="#6F8A4E" stroke-width="1"/>
+        </svg>
+
+        <svg class="stk" style="left:226px;top:890px;width:160px;height:50px;transform:rotate(-4deg)" viewBox="0 0 152 52">
+          <path d="M3 4l146 2-3 14 5 11-4 13-142 2 3-14-5-12z" fill="#CDB8A2"/>
+          <path d="M3 4l146 2-3 14 5 11-4 13-142 2 3-14-5-12z" fill="none" stroke="#B9A18A" stroke-width="1"/>
+          <text x="76" y="31" text-anchor="middle" font-family="Sacramento" font-size="21" fill="#F7EEE4">good food, good mood</text>
+        </svg>
+
+        <div class="tabs" id="tabs"></div>
+        <div class="foot"><span>© Dreamwy &nbsp;·&nbsp; Meal Planner 2027</span><span>Back to index</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- pencil -->
+  <div class="pencil"><div class="body"></div><div class="nib"></div></div>
+
+  <!-- wordmark -->
+  <div class="brand">
+    <svg viewBox="0 0 60 110" style="color:#8A5A3C;stroke:none;width:36px;height:66px;margin-bottom:6px"><use href="#sprig"/></svg>
+    <div>dreamwy</div>
+  </div>
+
+  <div class="vignette"></div>
+  <div class="grain"></div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+
+// 31-day strip (Jan 1 2027 is a Friday)
+const WK=['S','M','T','W','T','F','S'];
+$('days').innerHTML=Array.from({length:31},(_,k)=>{const d=k+1;
+  return `<div class="day${d===4?' on':''}">${WK[(5+d-1)%7]}<b>${d}</b></div>`}).join('');
+
+// today's menu
+const MEALS=[
+ ['Breakfast','7 AM',['Overnight oats + berries','Green tea']],
+ ['Lunch','1 PM',['Chickpea salad wrap','Greek yoghurt + honey']],
+ ['Dinner','7 PM',['Lemon garlic pasta','Rocket + parmesan salad']],
+ ['Snacks','4 PM',['Apple + almond butter']]
+];
+$('menu').innerHTML=MEALS.map(([t,time,rows])=>`<div class="mealhd">${t}</div>`+
+  rows.map((r,i)=>`<div class="row">${i===0?`<span class="tm">${time}</span>`:''}<span class="hand">${r}</span></div>`).join('')).join('');
+
+// prep list
+const PREP=[['Soak the oats',1],['Defrost chicken for Tue',1],['Wash + dry salad leaves',0],['Chop veg for tomorrow',0],['Bake sourdough',0],['',0],['Order groceries',0]];
+$('prep').innerHTML=PREP.map(([t,c])=>`<div class="todo"><i class="cb ${c?'on':''}"></i><span class="hand">${t}</span></div>`).join('');
+
+// grocery table: item, aisle, qty, need, got  (some gaps left on purpose)
+const GROC=[
+ ['Lemons','Produce','4',0,1],
+ ['Spaghetti','Pantry','1',0,1],
+ ['Garlic','Produce','2',1,0],
+ ['Rocket','Produce','1',0,1],
+ ['Parmesan','Dairy','',1,0],
+ ['','','4',0,0],
+ ['Chickpeas','Tins','2',1,1],
+ ['Greek yoghurt','Dairy','1',0,1],
+ ['Sourdough','Bakery','',1,0],
+ ['Oat milk','Dairy','2',1,0],
+ ['Almond butter','Pantry','1',0,0],
+ ['','','',0,0],
+ ['Berries','Frozen','1',1,0],
+ ['','','',0,0],
+ ['','','',0,0]
+];
+const bx=on=>`<span class="box${on?' on':''}"></span>`;
+$('groc').innerHTML=GROC.map(([a,b,c,n,g])=>`<tr><td class="hand">${a}</td><td class="hand">${b}</td><td class="hand c">${c}</td><td class="c">${bx(n)}</td><td class="c">${bx(g)}</td></tr>`).join('');
+
+// notes & wins
+$('notes').className='notes-rows';
+$('notes').innerHTML=['Tried the new miso soup!','','Meal prep done by 6pm','Leftovers = Tuesday lunch','Trying a veggie night'].
+  map(t=>`<div class="row"><span class="hand">${t}</span></div>`).join('');
+
+// month tabs
+$('tabs').innerHTML=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].
+  map((t,i)=>`<div class="tab${i===0?' on':''}">${t}</div>`).join('');
+</script>
+</body>
+</html>
