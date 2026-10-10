@@ -9,7 +9,9 @@ W, H = 2400, 1800
 src = Image.open(SRC).convert("RGB")
 daily = src.crop((667, 398, 1143, 1070))   # screen only, bezel removed
 cover = src.crop((111, 395, 598, 1080))
-# only integrations the planner really links to: Google Calendar and ChatGPT (crops) + Apple Shortcuts (drawn)
+# the four app icons from the original mockup: Apple Calendar, Reminders, Google Calendar, ChatGPT
+icon_acal = src.crop((485, 302, 547, 362))
+icon_rem = src.crop((559, 302, 621, 362))
 icon_gcal = src.crop((635, 302, 697, 362))
 icon_gpt = src.crop((709, 302, 771, 362))
 
@@ -270,30 +272,11 @@ ink = (96, 70, 58)
 spaced(d, (W / 2, 52), "2026 - 2027   \u2022   +1000 STICKERS", ImageFont.truetype(serif, 40), ink, 9)
 spaced(d, (W / 2, 108), "ADHD PLANNER", ImageFont.truetype(serif, 108), ink, 16)
 spaced(d, (W / 2, 252), "PLANNER FOR ADHD & NEURODIVERGENT BRAINS", ImageFont.truetype(sans, 29), (252, 249, 245), 8)
-# integrations the planner genuinely links to: Apple Shortcuts, Google Calendar, ChatGPT
-def shortcuts_icon(n):
-    k = 4
-    big = Image.new("RGBA", (n * k, n * k))
-    g = Image.new("RGB", big.size)
-    gd = ImageDraw.Draw(g)
-    for i in range(big.width * 2):
-        t = i / (big.width * 2)
-        c = (int(238 - 40 * t), int(60 + 110 * t), int(130 - 80 * t)) if t < .5 else (int(218 + 30 * (t - .5)), int(115 + 40 * (t - .5)), int(105 - 20 * (t - .5)))
-        gd.line([(i, 0), (0, i)], fill=c, width=3)
-    big.paste(g, (0, 0))
-    ov = Image.new("RGBA", big.size, (0, 0, 0, 0))
-    od = ImageDraw.Draw(ov)
-    u = n * k
-    od.rounded_rectangle((u * .22, u * .2, u * .66, u * .64), radius=int(u * .1), fill=(255, 255, 255, 235))
-    od.rounded_rectangle((u * .34, u * .36, u * .78, u * .8), radius=int(u * .1), fill=(255, 255, 255, 150))
-    ov = ov.rotate(0)
-    big.alpha_composite(ov)
-    return big.resize((n, n), Image.LANCZOS).convert("RGB")
-
+# app icons (original artwork, cropped from the source mockup)
 IC = 88
-tiles = [shortcuts_icon(IC)] + [i.resize((IC, IC), Image.LANCZOS).filter(ImageFilter.UnsharpMask(1.2, 90, 0)) for i in (icon_gcal, icon_gpt)]
-gap = 24
-x0 = 2050 - (IC * 3 + gap * 2)
+tiles = [i.resize((IC, IC), Image.LANCZOS).filter(ImageFilter.UnsharpMask(1.2, 90, 0)) for i in (icon_acal, icon_rem, icon_gcal, icon_gpt)]
+gap = 22
+x0 = 2050 - (IC * 4 + gap * 3)
 mk_i = Image.new("L", (IC, IC), 0); ImageDraw.Draw(mk_i).rounded_rectangle((0, 0, IC - 1, IC - 1), radius=21, fill=255)
 spaced(d, (x0 - 28 - 105, 306 + 22), "WORKS WITH", ImageFont.truetype(sans, 19), ink, 5)
 x = x0
