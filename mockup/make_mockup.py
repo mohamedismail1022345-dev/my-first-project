@@ -182,8 +182,8 @@ def place(dev, cx, cy):
     canvas.alpha_composite(dev, (x, y))
 
 
-place(tablet(cover, 1130, 4), 770, 1115)
-place(tablet(daily, 1270, -2), 1590, 1060)
+place(tablet(cover, 1130, 4), 770, 1075)
+place(tablet(daily, 1320, -1.5), 1590, 1035)
 
 # pencil lying on the cover
 pen = Image.new("RGBA", (900, 30), (0, 0, 0, 0))
@@ -282,7 +282,7 @@ def sparkle(d, n, col=(214, 168, 84)):
 
 
 # "+1000 STICKERS" seal
-sx, sy, sr = 235, 600, 108
+sx, sy, sr = 222, 585, 97
 seal = Image.new("RGBA", (sr * 2 + 40, sr * 2 + 40), (0, 0, 0, 0))
 sd = ImageDraw.Draw(seal)
 sc = sr + 20
@@ -291,34 +291,36 @@ for i in range(26):
     sd.ellipse((sc + (sr - 6) * math.cos(a) - 12, sc + (sr - 6) * math.sin(a) - 12, sc + (sr - 6) * math.cos(a) + 12, sc + (sr - 6) * math.sin(a) + 12), fill=(122, 88, 72, 255))
 sd.ellipse((sc - sr + 6, sc - sr + 6, sc + sr - 6, sc + sr - 6), fill=(122, 88, 72, 255))
 sd.ellipse((sc - sr + 18, sc - sr + 18, sc + sr - 18, sc + sr - 18), outline=(236, 220, 200, 255), width=2)
-tf = ImageFont.truetype(serif, 58); sf = ImageFont.truetype(sans, 18)
+tf = ImageFont.truetype(serif, 52); sf = ImageFont.truetype(sans, 16)
 cream = (250, 242, 232, 255)
-sd.text((sc, sc - 20), "+1000", font=tf, fill=cream, anchor="mm")
-spaced(sd, (sc, sc + 20), "STICKERS", sf, cream, 4)
-sd.line([(sc - 50, sc + 13), (sc + 50, sc + 13)], fill=cream, width=2)
+sd.text((sc, sc - 18), "+1000", font=tf, fill=cream, anchor="mm")
+spaced(sd, (sc, sc + 18), "STICKERS", sf, cream, 4)
+sd.line([(sc - 45, sc + 12), (sc + 45, sc + 12)], fill=cream, width=2)
 seal = seal.rotate(10, expand=True, resample=Image.BICUBIC)
 drop(seal.split()[3], sx - seal.width // 2, sy - seal.height // 2, [(30, 46, 22, .3), (10, 16, 8, .45), (3, 5, 3, .55)])
 canvas.alpha_composite(seal, (sx - seal.width // 2, sy - seal.height // 2))
 
 d = ImageDraw.Draw(canvas)
 ink = (96, 70, 58)
-spaced(d, (W / 2, 52), "2026 - 2027   \u2022   +1000 STICKERS", ImageFont.truetype(serif, 40), ink, 9)
-spaced(d, (W / 2, 108), "ADHD PLANNER", ImageFont.truetype(serif, 108), ink, 16)
-spaced(d, (W / 2, 252), "PLANNER FOR ADHD & NEURODIVERGENT BRAINS", ImageFont.truetype(sans, 29), (252, 249, 245), 8)
+spaced(d, (W / 2, 44), "2026 - 2027   \u2022   +1000 STICKERS", ImageFont.truetype(serif, 40), ink, 9)
+spaced(d, (W / 2, 94), "ADHD PLANNER", ImageFont.truetype(serif, 108), ink, 16)
+spaced(d, (W / 2, 232), "PLANNER FOR ADHD & NEURODIVERGENT BRAINS", ImageFont.truetype(sans, 29), (252, 249, 245), 8)
 # app icons (original artwork, cropped from the source mockup)
 IC = 88
 tiles = [i.resize((IC, IC), Image.LANCZOS).filter(ImageFilter.UnsharpMask(1.2, 90, 0)) for i in (icon_acal, icon_rem, icon_gcal, icon_gpt)]
 gap = 22
 x0 = 2050 - (IC * 4 + gap * 3)
 mk_i = Image.new("L", (IC, IC), 0); ImageDraw.Draw(mk_i).rounded_rectangle((0, 0, IC - 1, IC - 1), radius=21, fill=255)
-spaced(d, (x0 - 28 - 105, 306 + 22), "WORKS WITH", ImageFont.truetype(sans, 19), ink, 5)
+spaced(d, (x0 - 28 - 105, 278 + 22), "WORKS WITH", ImageFont.truetype(sans, 19), ink, 5)
 x = x0
 for ic in tiles:
     tile = Image.new("RGBA", (IC, IC)); tile.paste(ic, (0, 0)); tile.putalpha(mk_i)
-    drop(mk_i, x, 306, [(2, 4, 3, .35), (6, 12, 12, .25)])
-    canvas.alpha_composite(tile, (x, 306))
+    drop(mk_i, x, 278, [(2, 4, 3, .35), (6, 12, 12, .25)])
+    canvas.alpha_composite(tile, (x, 278))
     x += IC + gap
 d = ImageDraw.Draw(canvas)
+fn = ImageFont.truetype(sans, 15)
+d.text((W - 60, H - 34), "App logos are trademarks of their respective owners. No affiliation or endorsement implied.", font=fn, fill=(120, 100, 88), anchor="rm")
 spaced(d, (W / 2, 1728), "dreamwy", ImageFont.truetype(serif, 46), ink, 11)
 import random
 out = canvas.convert("RGB")
