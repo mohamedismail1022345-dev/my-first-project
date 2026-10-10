@@ -319,8 +319,6 @@ for ic in tiles:
     canvas.alpha_composite(tile, (x, 278))
     x += IC + gap
 d = ImageDraw.Draw(canvas)
-fn = ImageFont.truetype(sans, 15)
-d.text((W - 60, H - 34), "App logos are trademarks of their respective owners. No affiliation or endorsement implied.", font=fn, fill=(120, 100, 88), anchor="rm")
 spaced(d, (W / 2, 1728), "dreamwy", ImageFont.truetype(serif, 46), ink, 11)
 import random
 out = canvas.convert("RGB")
