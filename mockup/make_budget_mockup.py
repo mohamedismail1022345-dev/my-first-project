@@ -159,6 +159,9 @@ haze = Image.linear_gradient("L").resize((W, H)).point(lambda v: 255 - int(v * .
 rays = ImageChops.multiply(rays, haze)
 canvas = Image.composite(Image.new("RGBA", (W, H), (255, 238, 210, 255)), canvas, rays.point(lambda v: int(v * .22)))
 
+# a touch darker overall (background only: the tablets are placed after this)
+canvas = ImageChops.multiply(canvas.convert("RGB"), Image.new("RGB", (W, H), (222, 220, 218))).convert("RGBA")
+
 
 def spaced(draw, xy, text, font, fill, tracking, anchor_center=True):
     widths = [draw.textlength(c, font=font) for c in text]
