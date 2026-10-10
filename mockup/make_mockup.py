@@ -175,19 +175,6 @@ def sparkle(d, n, col=(214, 168, 84)):
     c = n / 2
     d.polygon([(c, n * .04), (c + n * .1, c - n * .1), (n * .96, c), (c + n * .1, c + n * .1), (c, n * .96), (c - n * .1, c + n * .1), (n * .04, c), (c - n * .1, c - n * .1)], fill=col)
 
-sticker(star, 150, 120, 960, -12)
-sticker(flower, 190, 250, 1180, 10)
-sticker(heart, 150, 100, 1400, -8)
-sticker(cup, 170, 270, 1520, 8)
-sticker(tape, 230, 190, 880, -35, border=8)
-sticker(sun, 170, 2250, 640, 8)
-sticker(leaf, 190, 2200, 840, -10)
-sticker(check, 140, 2290, 1000, 6)
-sticker(moon, 150, 2150, 1180, 18)
-sticker(sparkle, 120, 2290, 1330, 0)
-sticker(flower, 150, 2190, 1480, -14)
-sticker(heart, 120, 2300, 1590, 12)
-sticker(star, 110, 140, 1620, 14)
 
 # "+1000 STICKERS" seal
 sx, sy, sr = 260, 650, 150
