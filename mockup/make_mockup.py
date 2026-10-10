@@ -2,7 +2,7 @@
 Usage: python3 make_mockup.py <source_mockup.webp> <out.png>
 The daily page and cover are cropped unchanged from the source mockup."""
 import sys
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 SRC, OUT = sys.argv[1], sys.argv[2]
 W, H = 2400, 1800
@@ -37,6 +37,37 @@ ld.polygon([(1100, 0), (1750, 0), (W, 560), (W, 900), (1500, 0)], fill=40)
 lt = lt.filter(ImageFilter.GaussianBlur(90))
 bg = Image.composite(Image.new("RGB", (W, H), (236, 227, 216)), bg, lt.point(lambda v: int(v * .55)))
 canvas = bg.convert("RGBA")
+
+# ---------- sunlight through a window: hard-edged light panes + soft god-rays
+K = 0.5  # light travels down-right, so patches lean right as they fall
+def skew(x0, y0, x1, y1):
+    return [(x0 + K * y0, y0), (x1 + K * y0, y0), (x1 + K * y1, y1), (x0 + K * y1, y1)]
+
+panes = Image.new("L", (W, H), 0)
+pd_ = ImageDraw.Draw(panes)
+for r in range(4):
+    for c in range(3):
+        x0 = -330 + c * 400
+        y0 = -120 + r * 470
+        pd_.polygon(skew(x0, y0, x0 + 340, y0 + 420), fill=255)
+fall = Image.linear_gradient("L").resize((W, H)).rotate(0)           # top -> bottom
+fx = Image.linear_gradient("L").rotate(90).resize((W, H))            # right -> left
+fall = Image.eval(ImageChops.add(fall.point(lambda v: v // 2), fx.point(lambda v: v // 2)), lambda v: v)
+fall = fall.point(lambda v: max(0, 255 - int(v * 1.2)))             # bright top-left, gone by centre
+sharp = ImageChops.multiply(panes.filter(ImageFilter.GaussianBlur(5)), fall)
+glow = ImageChops.multiply(panes.filter(ImageFilter.GaussianBlur(70)), fall)
+sun = Image.new("RGBA", (W, H), (255, 240, 214, 255))
+canvas = Image.composite(sun, canvas, sharp.point(lambda v: int(v * .42)))
+canvas = Image.composite(sun, canvas, glow.point(lambda v: int(v * .22)))
+
+rays = Image.new("L", (W, H), 0)
+rd = ImageDraw.Draw(rays)
+for x0, wd, a in [(120, 90, 150), (420, 150, 110), (760, 70, 130), (1060, 190, 80), (1500, 110, 90), (1900, 160, 70)]:
+    rd.polygon(skew(x0 - 300, -50, x0 - 300 + wd, H + 50), fill=a)
+rays = rays.filter(ImageFilter.GaussianBlur(34))
+haze = Image.linear_gradient("L").resize((W, H)).point(lambda v: 255 - int(v * .8))
+rays = ImageChops.multiply(rays, haze)
+canvas = Image.composite(Image.new("RGBA", (W, H), (255, 238, 210, 255)), canvas, rays.point(lambda v: int(v * .22)))
 
 
 def spaced(draw, xy, text, font, fill, tracking, anchor_center=True):
