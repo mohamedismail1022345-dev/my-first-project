@@ -1,7 +1,7 @@
 """Builds the CONTENT planner listing mockup (2400x1800), same style as make_college_mockup.py.
-Usage: python3 make_content_mockup.py <content_source.jpg> <out.png>
-<content_source> is the original 2000x2000 Content mockup: it supplies the cover, the daily page
-and the four app icons. The stylus lying on it is painted out; the schedule's hidden time labels
+Usage: python3 make_content_mockup.py <content_source.jpg> <content_cover.webp> <out.png>
+<content_source> is the original 2000x2000 Content mockup: it supplies the daily page and the four app icons.
+<content_cover> is the clean cover page supplied separately (no stylus, nothing hidden). The stylus lying on it is painted out; the schedule's hidden time labels
 (8, 9 and 10 AM), the clipped row rules and the top rule are re-drawn, so every entry stays visible."""
 import sys
 import math
@@ -13,11 +13,9 @@ except Exception:
     cv2 = None
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
-SRC, OUT = sys.argv[1], sys.argv[2]
+SRC, COVER, OUT = sys.argv[1], sys.argv[2], sys.argv[3]
 W, H = 2400, 1800
 src = Image.open(SRC).convert("RGB")
-COVER_BOX = (175, 620, 912, 1736)    # visible part of the cover screen (the daily tablet's shadow starts at ~915)
-COVER_FULL_W = 797                   # real cover width: centred on its text (x=572.5), left edge x=175
 DAILY_BOX = (985, 642, 1825, 1758)   # daily page screen only
 TIP, END = np.array([707.0, 1775.5]), np.array([1056.7, 943.3])   # the stylus lying on the original
 
@@ -75,92 +73,31 @@ def pencil_mask(size, box, hl=48, hr=26, ext=6):
     return np.asarray(m.crop(box)) > 0
 
 
-# paper grain, measured on a clean patch of the cover, re-used to texture everything we repaint there
-_clean = np.asarray(src.crop((220, 650, 560, 900)).convert("L"), float)
-_bl = np.asarray(Image.fromarray(_clean.astype("uint8")).filter(ImageFilter.GaussianBlur(3)), float)
-GRAIN = _clean - _bl
-
-# ---- cover: take the stylus off, extend the strip hidden behind the daily tablet, show the two-year range
-cover = src.crop(COVER_BOX)
-cmask = pencil_mask(src.size, COVER_BOX, hl=27, hr=21)
-if cv2 is not None:
-    # patch-based fill so the watercolour leaves under the stylus keep their texture instead of turning into a smear.
-    # The centre text block is hidden from the patch search (so no letters get copied in) and pasted back afterwards.
-    TXT = (170, 330, 640, 780)                                    # x0, y0, x1, y1 in cover-crop coordinates
-    base = np.asarray(cover.convert("RGB")).copy()
-    guard = np.zeros(base.shape[:2], np.uint8); guard[TXT[1]:TXT[3], TXT[0]:TXT[2]] = 255
-    clean = cv2.inpaint(cv2.cvtColor(base, cv2.COLOR_RGB2BGR), guard, 9, cv2.INPAINT_TELEA)
-    m8 = cv2.dilate(cmask.astype("uint8") * 255, np.ones((3, 3), np.uint8))
-    out = np.zeros_like(clean)
-    cv2.xphoto.inpaint(clean, 255 - m8, out, cv2.xphoto.INPAINT_SHIFTMAP)
-    out = cv2.cvtColor(out, cv2.COLOR_BGR2RGB).astype(float)
-    # The patch fill has the right grain but its overall tone can drift (it prefers paper over leaf). So keep its fine
-    # detail and take the broad tone from a straight bridge between the colours on either side of the stylus, row by row.
-    Hh, Ww = m8.shape
-    Lc = np.full((Hh, 3), np.nan); Rc = np.full((Hh, 3), np.nan); runs = {}
-    for y in range(Hh):
-        xs = np.flatnonzero(m8[y])
-        if len(xs):
-            a, b = xs.min(), xs.max(); runs[y] = (a, b)
-            if a - 8 >= 0: Lc[y] = base[y, a - 8:a].mean(0)
-            if b + 9 <= Ww: Rc[y] = base[y, b + 1:b + 9].mean(0)
-
-    def _vsmooth(c, sg=5):
-        ok = (~np.isnan(c[:, 0])).astype(float); v = np.nan_to_num(c)
-        k = _k(sg)
-        num = _conv(v * ok[:, None], k, 0); den = _conv(ok, k, 0)
-        return np.where(den[:, None] > 1e-3, num / np.maximum(den, 1e-6)[:, None], np.nan), ok > 0
-    Ls, Lok = _vsmooth(Lc); Rs, Rok = _vsmooth(Rc)
-    interp = out.copy()
-    for y, (a, b) in runs.items():
-        xs = np.arange(a, b + 1); t = ((xs - a + 0.5) / (b - a + 1))[:, None]
-        l = Ls[y] if not np.isnan(Ls[y, 0]) else None; r = Rs[y] if not np.isnan(Rs[y, 0]) else None
-        if l is not None and r is not None: interp[y, a:b + 1] = l * (1 - t) + r * t
-        elif l is not None: interp[y, a:b + 1] = l
-        elif r is not None: interp[y, a:b + 1] = r
-    hp = out - cv2.GaussianBlur(out.astype("float32"), (0, 0), 9)
-    out = np.where(m8[..., None] > 0, interp + hp, out)
-    soft = cv2.GaussianBlur(m8.astype("float32") / 255, (0, 0), 1.6)[..., None]
-    comp = base.astype(float) * (1 - soft) + out * soft
-    comp[TXT[1]:TXT[3], TXT[0]:TXT[2]] = base[TXT[1]:TXT[3], TXT[0]:TXT[2]]
-    cover = Image.fromarray(np.clip(comp, 0, 255).astype("uint8"))
-else:
-    cover = fill_region(cover, cmask, 14, 14, tex=GRAIN)
-# The right ~60 px of the real cover are hidden behind the daily tablet in the original. Instead of mirroring them
-# (which duplicates the cut-off leaf), ease-stretch the last 200 px of artwork over 260 px: gentle at the left, widest at the edge.
-BAND_SRC, BAND_OUT = 320, 320 + (COVER_FULL_W - cover.width)
-x0 = cover.width - BAND_SRC
-uu = (np.arange(BAND_OUT) + 0.5) / BAND_OUT
-ss = BAND_SRC * (uu + 0.3 * uu * (1 - uu))                      # monotonic, ds/du: 1.0 -> 0.54
-arr = np.asarray(cover, float)
-band = np.empty((arr.shape[0], BAND_OUT, 3))
-i0 = np.clip(np.floor(ss - 0.5).astype(int), 0, BAND_SRC - 1); i1 = np.clip(i0 + 1, 0, BAND_SRC - 1)
-fr = (ss - 0.5 - i0)[None, :, None]
-src_band = arr[:, x0:, :]
-band = src_band[:, i0, :] * (1 - fr) + src_band[:, i1, :] * fr
-cover_full = np.concatenate([arr[:, :x0, :], band], axis=1)
-cover = Image.fromarray(np.clip(cover_full, 0, 255).astype("uint8"))
-assert cover.width == COVER_FULL_W
+# ---- cover: the clean cover supplied by the author (no stylus, no hidden edge); only the year line is changed to the two-year range
+cover_raw = Image.open(COVER).convert("RGB")                     # 584 x 815 (a page, a little taller than the 3:4 screen)
+cover_raw = cover_raw.crop((0, 24, cover_raw.width, cover_raw.height - 15))      # 3:4 like the daily screen; trims paper top/bottom only
+K2 = 2
+cover = cover_raw.resize((cover_raw.width * K2, cover_raw.height * K2), Image.LANCZOS)
+_g = np.asarray(cover.crop((60, 880, 360, 1080)).convert("L"), float)             # clean paper patch for grain
+GRAIN = _g - np.asarray(Image.fromarray(_g.astype("uint8")).filter(ImageFilter.GaussianBlur(3)), float)
 
 
 def cover_year(img, text="2026 - 2027"):
-    """Replace the single '2027' (and its two thin rules) on the cover with the two-year range."""
-    ox, oy = COVER_BOX[0], COVER_BOX[1]
-    cx = 572.5 - ox                                  # centre of the cover text column
-    m = np.zeros((img.height, img.width), bool)
-    m[1066 - oy:1170 - oy, int(cx) - 140:int(cx) + 141] = True
-    img = fill_region(img, m, 10, 10, tex=GRAIN)
-    k = 6
-    layer = Image.new("RGBA", (img.width * k, img.height * k), (0, 0, 0, 0))
-    ld = ImageDraw.Draw(layer)
-    for yy in (1079, 1155):                          # the two thin rules, widened to suit the longer text
-        ld.rectangle(((cx - 118) * k, (yy - oy) * k, (cx + 118) * k, (yy - oy + 1.4) * k), fill=(204, 178, 150, 255))
-    f = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf", int(25 * k))
-    tr = 9 * k
-    widths = [ld.textlength(c, font=f) for c in text]
+    """Replace '2027' (and its two short rules) with '2026 - 2027' on the cover; coordinates are in the 2x image."""
+    cx = 289 * K2                                                  # the text column is centred here
+    oy = 24 * K2                                                   # rows trimmed from the top
+    m = np.zeros((img.height, img.width), bool); m[(326 * K2 - oy):(402 * K2 - oy), (222 * K2):(356 * K2)] = True
+    img = fill_region(img, m, 14, 14, tex=GRAIN)
+    k = 3
+    layer = Image.new("RGBA", (img.width * k, img.height * k), (0, 0, 0, 0)); ld = ImageDraw.Draw(layer)
+    for yy in (336, 392):                                          # the two thin rules, widened to suit the longer text
+        ld.rectangle(((cx - 84 * K2) * k, (yy * K2 - oy) * k, (cx + 84 * K2) * k, (yy * K2 - oy + 1.5 * K2) * k), fill=(168, 148, 116, 255))
+    f = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf", int(19.5 * K2 * k))
+    tr = 4.4 * K2 * k
+    widths = [ld.textlength(ch, font=f) for ch in text]
     x = cx * k - (sum(widths) + tr * (len(text) - 1)) / 2
-    for c, w in zip(text, widths):
-        ld.text((x, (1131 - oy) * k), c, font=f, fill=(96, 76, 64, 255), anchor="ls")
+    for ch, w in zip(text, widths):
+        ld.text((x, (375 * K2 - oy) * k), ch, font=f, fill=(96, 80, 60, 255), anchor="ls")
         x += w + tr
     layer = layer.resize(img.size, Image.LANCZOS)
     img = img.convert("RGBA"); img.alpha_composite(layer)
