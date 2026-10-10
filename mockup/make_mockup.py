@@ -309,7 +309,7 @@ spaced(d, (W / 2, 232), "PLANNER FOR ADHD & NEURODIVERGENT BRAINS", ImageFont.tr
 IC = 88
 tiles = [i.resize((IC, IC), Image.LANCZOS).filter(ImageFilter.UnsharpMask(1.2, 90, 0)) for i in (icon_acal, icon_rem, icon_gcal, icon_gpt)]
 gap = 22
-x0 = 2050 - (IC * 4 + gap * 3)
+x0 = 1950 - (IC * 4 + gap * 3)
 mk_i = Image.new("L", (IC, IC), 0); ImageDraw.Draw(mk_i).rounded_rectangle((0, 0, IC - 1, IC - 1), radius=21, fill=255)
 spaced(d, (x0 - 28 - 105, 278 + 22), "WORKS WITH", ImageFont.truetype(sans, 19), ink, 5)
 x = x0
