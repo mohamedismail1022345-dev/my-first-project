@@ -314,12 +314,12 @@ LEFT = 450                                         # left edge of the cover tabl
 lab_w = sum(d.textlength(c, font=lab_font) for c in "WORKS WITH") + 5 * 9
 x0 = int(LEFT + lab_w + 28)
 mk_i = Image.new("L", (IC, IC), 0); ImageDraw.Draw(mk_i).rounded_rectangle((0, 0, IC - 1, IC - 1), radius=21, fill=255)
-spaced(d, (LEFT, 278 + 22), "WORKS WITH", lab_font, ink, 5, anchor_center=False)
+spaced(d, (LEFT, 306 + 22), "WORKS WITH", lab_font, ink, 5, anchor_center=False)
 x = x0
 for ic in tiles:
     tile = Image.new("RGBA", (IC, IC)); tile.paste(ic, (0, 0)); tile.putalpha(mk_i)
-    drop(mk_i, x, 278, [(2, 4, 3, .35), (6, 12, 12, .25)])
-    canvas.alpha_composite(tile, (x, 278))
+    drop(mk_i, x, 306, [(2, 4, 3, .35), (6, 12, 12, .25)])
+    canvas.alpha_composite(tile, (x, 306))
     x += IC + gap
 d = ImageDraw.Draw(canvas)
 spaced(d, (W / 2, 1728), "dreamwy", ImageFont.truetype(serif, 46), ink, 11)
