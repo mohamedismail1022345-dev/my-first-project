@@ -126,62 +126,41 @@ F = "/usr/share/fonts/truetype/"
 serif = F + "liberation/LiberationSerif-Regular.ttf"
 sans = F + "dejavu/DejaVuSans.ttf"
 
-# --- background: warm greige with soft window shadow
-bg = Image.new("RGB", (W, H), (200, 189, 178))
-px = ImageDraw.Draw(bg)
-for y in range(H):
-    t = y / H
-    px.line([(0, y), (W, y)], fill=(int(206 - 20 * t), int(195 - 22 * t), int(184 - 22 * t)))
-sh = Image.new("L", (W, H), 0)
-d = ImageDraw.Draw(sh)
-d.polygon([(0, 0), (480, 0), (140, H)], fill=70)
-d.polygon([(640, 0), (760, 0), (420, H)], fill=34)
-d.polygon([(1750, 0), (W, 0), (W, 560)], fill=50)
-sh = sh.filter(ImageFilter.GaussianBlur(110))
-bg = Image.composite(Image.new("RGB", (W, H), (112, 98, 88)), bg, sh)
-# window light falling diagonally across the surface
-lt = Image.new("L", (W, H), 0)
-ld = ImageDraw.Draw(lt)
-ld.polygon([(480, 0), (640, 0), (300, H), (140, H)], fill=120)
-ld.polygon([(760, 0), (1100, 0), (760, H), (420, H)], fill=70)
-ld.polygon([(1100, 0), (1750, 0), (W, 560), (W, 900), (1500, 0)], fill=40)
-lt = lt.filter(ImageFilter.GaussianBlur(90))
-bg = Image.composite(Image.new("RGB", (W, H), (236, 227, 216)), bg, lt.point(lambda v: int(v * .55)))
-canvas = bg.convert("RGBA")
+# --- background: warm taupe wall lit by one broad, soft beam of window light.
+#     Shade on the left (darker toward the bottom), lighter shade on the right, a soft window-frame shadow in the top-right corner.
+_yy, _xx = np.mgrid[0:H, 0:W].astype(np.float32)
 
-# ---------- sunlight through a window: hard-edged light panes + soft god-rays
-K = 0.5  # light travels down-right, so patches lean right as they fall
-def skew(x0, y0, x1, y1):
-    return [(x0 + K * y0, y0), (x1 + K * y0, y0), (x1 + K * y1, y1), (x0 + K * y1, y1)]
 
-panes = Image.new("L", (W, H), 0)
-pd_ = ImageDraw.Draw(panes)
-for r in range(4):
-    for c in range(3):
-        x0 = -330 + c * 400
-        y0 = -120 + r * 470
-        pd_.polygon(skew(x0, y0, x0 + 340, y0 + 420), fill=255)
-fall = Image.linear_gradient("L").resize((W, H)).rotate(0)           # top -> bottom
-fx = Image.linear_gradient("L").rotate(90).resize((W, H))            # right -> left
-fall = Image.eval(ImageChops.add(fall.point(lambda v: v // 2), fx.point(lambda v: v // 2)), lambda v: v)
-fall = fall.point(lambda v: max(0, 255 - int(v * 1.2)))             # bright top-left, gone by centre
-sharp = ImageChops.multiply(panes.filter(ImageFilter.GaussianBlur(5)), fall)
-glow = ImageChops.multiply(panes.filter(ImageFilter.GaussianBlur(70)), fall)
-sun = Image.new("RGBA", (W, H), (255, 240, 214, 255))
-canvas = Image.composite(sun, canvas, sharp.point(lambda v: int(v * .42)))
-canvas = Image.composite(sun, canvas, glow.point(lambda v: int(v * .22)))
+def _smooth(e0, e1, v):
+    t = np.clip((v - e0) / (e1 - e0), 0, 1)
+    return t * t * (3 - 2 * t)
 
-rays = Image.new("L", (W, H), 0)
-rd = ImageDraw.Draw(rays)
-for x0, wd, a in [(120, 90, 150), (420, 150, 110), (760, 70, 130), (1060, 190, 80), (1500, 110, 90), (1900, 160, 70)]:
-    rd.polygon(skew(x0 - 300, -50, x0 - 300 + wd, H + 50), fill=a)
-rays = rays.filter(ImageFilter.GaussianBlur(34))
-haze = Image.linear_gradient("L").resize((W, H)).point(lambda v: 255 - int(v * .8))
-rays = ImageChops.multiply(rays, haze)
-canvas = Image.composite(Image.new("RGBA", (W, H), (255, 238, 210, 255)), canvas, rays.point(lambda v: int(v * .22)))
 
-# a touch darker overall (background only: the tablets are placed after this)
-canvas = ImageChops.multiply(canvas.convert("RGB"), Image.new("RGB", (W, H), (222, 220, 218))).convert("RGBA")
+_xl = 545 - 0.045 * _yy                      # left edge of the beam (leans a little as the light falls)
+_xr = 1880 - 0.035 * _yy                     # right edge
+_beam = _smooth(_xl - 85, _xl + 130, _xx) * (1 - _smooth(_xr - 80, _xr + 80, _xx))
+_beam *= 1 - 0.26 * (_yy / H) ** 1.4         # the light weakens toward the bottom
+_bloom = np.exp(-(((_xx - 1180) / 760) ** 2 + ((_yy - 230) / 520) ** 2))     # a little warm glow up where the title sits
+_lit = np.array([226, 213, 201], np.float32)
+_shade_l = np.array([156, 142, 132], np.float32)
+_shade_r = np.array([184, 170, 159], np.float32)
+_sx = _smooth(900, 2400, _xx)[..., None]
+_shade = _shade_l * (1 - _sx) + _shade_r * _sx
+_shade = _shade * (1 - 0.20 * (_yy / H)[..., None] * (1 - _beam[..., None]))     # shade sinks toward the bottom corners
+_bg = _shade + (_lit - _shade) * _beam[..., None]
+_bg = _bg * (1 + 0.05 * _bloom[..., None] * _beam[..., None])
+_corner = Image.new("L", (W, H), 0)
+ImageDraw.Draw(_corner).polygon([(1930, 0), (W, 0), (W, 430)], fill=255)
+_corner = np.asarray(_corner.filter(ImageFilter.GaussianBlur(75)), np.float32) / 255
+_bg = _bg * (1 - 0.34 * _corner[..., None])
+# faint "god-ray" streaks inside the beam: broad, very low contrast, same lean as the beam edges
+_rays = np.zeros((H, W), np.float32)
+for _cx, _wd, _a in [(760, 110, 1.0), (1090, 70, 0.7), (1400, 140, 0.9), (1690, 60, 0.6)]:
+    _c = _cx - 0.04 * _yy
+    _rays += _a * np.exp(-((_xx - _c) / _wd) ** 2)
+_rays *= _beam * (1 - 0.7 * (_yy / H))
+_bg = _bg * (1 + 0.03 * _rays[..., None])
+canvas = Image.fromarray(np.clip(_bg, 0, 255).astype("uint8")).convert("RGBA")
 
 
 def spaced(draw, xy, text, font, fill, tracking, anchor_center=True):
@@ -300,6 +279,11 @@ d = ImageDraw.Draw(canvas)
 ink = (96, 70, 58)
 spaced(d, (W / 2, 44), "2026 - 2027   \u2022   +1000 STICKERS", ImageFont.truetype(serif, 40), ink, 9)
 spaced(d, (W / 2, 94), "SMALL BUSINESS PLANNER", ImageFont.truetype(serif, 92), ink, 13)
+_sub = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+spaced(ImageDraw.Draw(_sub), (W / 2, 234), "A CALM SYSTEM FOR A SMALL BUSINESS", ImageFont.truetype(sans, 29), (74, 52, 42, 255), 8)
+_sub = _sub.filter(ImageFilter.GaussianBlur(5)); _sub.putalpha(_sub.split()[3].point(lambda v: int(v * .75)))
+canvas.alpha_composite(_sub)
+d = ImageDraw.Draw(canvas)
 spaced(d, (W / 2, 232), "A CALM SYSTEM FOR A SMALL BUSINESS", ImageFont.truetype(sans, 29), (252, 249, 245), 8)
 # app icons (original artwork, cropped from the source mockup)
 IC = 88
@@ -323,7 +307,7 @@ out = canvas.convert("RGB")
 vg = Image.new("L", (W, H), 0)
 ImageDraw.Draw(vg).ellipse((-W * .25, -H * .25, W * 1.25, H * 1.25), fill=255)
 vg = vg.filter(ImageFilter.GaussianBlur(260))
-out = Image.composite(out, Image.new("RGB", (W, H), (150, 134, 122)), vg.point(lambda v: 150 + v * 105 // 255))
+out = Image.composite(out, Image.new("RGB", (W, H), (150, 134, 122)), vg.point(lambda v: 205 + v * 50 // 255))
 nz = Image.effect_noise((W, H), 14).convert("RGB")
 out = Image.blend(out, nz, 0.025)
 out.save(OUT)
