@@ -290,7 +290,7 @@ canvas.alpha_composite(pen, (1905, 705))
 
 
 # "+1000 STICKERS" seal
-sx, sy, sr = 2262, 900, 97
+sx, sy, sr = 545, 300, 97
 seal = Image.new("RGBA", (sr * 2 + 40, sr * 2 + 40), (0, 0, 0, 0))
 sd = ImageDraw.Draw(seal)
 sc = sr + 20
