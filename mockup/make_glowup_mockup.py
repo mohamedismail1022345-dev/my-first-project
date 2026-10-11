@@ -288,14 +288,14 @@ canvas.alpha_composite(pen, (40, 690))
 
 
 # "+1000 STICKERS" seal
-sx, sy, sr = 1930, 300, 97
+sx, sy, sr = 545, 300, 97
 seal = Image.new("RGBA", (sr * 2 + 40, sr * 2 + 40), (0, 0, 0, 0))
 sd = ImageDraw.Draw(seal)
 sc = sr + 20
 for i in range(26):
     a = i * 2 * math.pi / 26
-    sd.ellipse((sc + (sr - 6) * math.cos(a) - 12, sc + (sr - 6) * math.sin(a) - 12, sc + (sr - 6) * math.cos(a) + 12, sc + (sr - 6) * math.sin(a) + 12), fill=(164, 100, 96, 255))
-sd.ellipse((sc - sr + 6, sc - sr + 6, sc + sr - 6, sc + sr - 6), fill=(164, 100, 96, 255))
+    sd.ellipse((sc + (sr - 6) * math.cos(a) - 12, sc + (sr - 6) * math.sin(a) - 12, sc + (sr - 6) * math.cos(a) + 12, sc + (sr - 6) * math.sin(a) + 12), fill=(122, 88, 72, 255))
+sd.ellipse((sc - sr + 6, sc - sr + 6, sc + sr - 6, sc + sr - 6), fill=(122, 88, 72, 255))
 sd.ellipse((sc - sr + 18, sc - sr + 18, sc + sr - 18, sc + sr - 18), outline=(236, 220, 200, 255), width=2)
 tf = ImageFont.truetype(serif, 52); sf = ImageFont.truetype(sans, 16)
 cream = (250, 242, 232, 255)
