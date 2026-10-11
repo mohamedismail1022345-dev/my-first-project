@@ -256,8 +256,8 @@ def place(dev, cx, cy):
     canvas.alpha_composite(dev, (x, y))
 
 
-place(tablet(daily, 1080, 1.5), 745, 1105)       # daily page on the left, behind (the smaller iPad)
-place(tablet(cover, 1220, -4), 1600, 1085)     # cover on the right, in front and bigger: it overlaps the right edge of the page iPad
+place(tablet(daily, 1080, 0), 745, 1105)       # daily page on the left, behind (the smaller iPad)
+place(tablet(cover, 1220, 0), 1600, 1085)     # cover on the right, in front and bigger: it overlaps the right edge of the page iPad
 
 # pencil lying on the cover
 pen = Image.new("RGBA", (900, 30), (0, 0, 0, 0))
