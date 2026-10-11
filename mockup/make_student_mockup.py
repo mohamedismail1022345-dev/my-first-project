@@ -1,5 +1,5 @@
-"""Builds the STUDENT planner listing mockup (2400x1800): same style as the other mockups, with a slate-blue palette,
-the cover on the left, the daily page on the right and the stylus on the left of the cover.
+"""Builds the STUDENT planner listing mockup (2400x1800): same style as the other mockups, with the same amber background as the Reading mockup,
+the daily page on the left, the cover on the right and the stylus beside the cover.
 Usage: python3 make_student_mockup.py <student_source.jpg> <student_cover.webp> <out.png>
 <student_source> is the original 2000x2000 Student mockup (daily page + app icons); <student_cover> is the clean cover page.
 The stylus lying across the page is painted out of the page margin and the lessons table, and the cover year is changed to the range."""
@@ -153,9 +153,9 @@ _xr = 1830 + 0.035 * _yy                     # right edge
 _beam = _smooth(_xl - 85, _xl + 130, _xx) * (1 - _smooth(_xr - 80, _xr + 80, _xx))
 _beam *= 1 - 0.26 * (_yy / H) ** 1.4         # the light weakens toward the bottom
 _bloom = np.exp(-(((_xx - 1180) / 760) ** 2 + ((_yy - 230) / 520) ** 2))     # a little warm glow up where the title sits
-_lit = np.array([214, 224, 238], np.float32)
-_shade_l = np.array([120, 136, 160], np.float32)
-_shade_r = np.array([150, 166, 190], np.float32)
+_lit = np.array([240, 216, 176], np.float32)
+_shade_l = np.array([166, 132, 104], np.float32)
+_shade_r = np.array([192, 160, 128], np.float32)
 _sx = _smooth(900, 2400, _xx)[..., None]
 _shade = _shade_l * (1 - _sx) + _shade_r * _sx
 _shade = _shade * (1 - 0.20 * (_yy / H)[..., None] * (1 - _beam[..., None]))     # shade sinks toward the bottom corners
@@ -241,12 +241,12 @@ def drop(shape_alpha, x, y, layers):
 def place(dev, cx, cy):
     global canvas
     x, y = int(cx - dev.width / 2), int(cy - dev.height / 2)
-    drop(dev.split()[3], x, y, [(90, 130, 80, .26), (34, 52, 30, .34), (10, 16, 9, .5), (3, 5, 3, .55)])
+    drop(dev.split()[3], x, y, [(170, 240, 130, .38), (95, 140, 70, .42), (42, 64, 30, .48), (16, 26, 11, .58), (5, 8, 3, .65)])   # long cast shadow down-right + tight contact shadow
     canvas.alpha_composite(dev, (x, y))
 
 
-place(tablet(cover, 1130, 4), 690, 1085)       # cover on the left, behind
-place(tablet(daily, 1300, -1.5), 1585, 1050)     # daily page on the right, in front
+place(tablet(cover, 1130, -4), 1690, 1085)     # cover on the right, behind
+place(tablet(daily, 1300, 1.5), 815, 1050)       # daily page on the left, in front
 
 # pencil lying on the cover
 pen = Image.new("RGBA", (900, 30), (0, 0, 0, 0))
@@ -264,8 +264,8 @@ pd.polygon([(850, 4), (900, 15), (850, 26)], fill=(232, 228, 222, 255))
 pd.polygon([(888, 12), (900, 15), (888, 18)], fill=(60, 56, 54, 255))
 pd.rectangle((120, 5, 720, 7), fill=(255, 255, 255, 255))
 pen = pen.rotate(-100, expand=True, resample=Image.BICUBIC)
-drop(pen.split()[3], 40, 690, [(36, 52, 22, .30), (14, 20, 7, .45), (4, 6, 3, .6)])
-canvas.alpha_composite(pen, (40, 690))
+drop(pen.split()[3], 2165, 690, [(36, 52, 22, .30), (14, 20, 7, .45), (4, 6, 3, .6)])
+canvas.alpha_composite(pen, (2165, 690))
 
 
 # "+1000 STICKERS" seal
@@ -288,11 +288,11 @@ drop(seal.split()[3], sx - seal.width // 2, sy - seal.height // 2, [(30, 46, 22,
 canvas.alpha_composite(seal, (sx - seal.width // 2, sy - seal.height // 2))
 
 d = ImageDraw.Draw(canvas)
-ink = (44, 62, 94)
+ink = (104, 66, 38)
 spaced(d, (W / 2, 44), "2026 - 2027   \u2022   +1000 STICKERS", ImageFont.truetype(serif, 40), ink, 9)
 spaced(d, (W / 2, 94), "STUDENT PLANNER", ImageFont.truetype(serif, 108), ink, 16)
 _sub = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-spaced(ImageDraw.Draw(_sub), (W / 2, 234), "EVERYTHING FOR THE SCHOOL YEAR", ImageFont.truetype(sans, 24), (32, 48, 80, 255), 5)
+spaced(ImageDraw.Draw(_sub), (W / 2, 234), "EVERYTHING FOR THE SCHOOL YEAR", ImageFont.truetype(sans, 24), (96, 58, 34, 255), 5)
 _sub = _sub.filter(ImageFilter.GaussianBlur(5)); _sub.putalpha(_sub.split()[3].point(lambda v: int(v * .75)))
 canvas.alpha_composite(_sub)
 d = ImageDraw.Draw(canvas)
