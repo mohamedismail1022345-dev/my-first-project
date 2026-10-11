@@ -245,8 +245,8 @@ def place(dev, cx, cy):
     canvas.alpha_composite(dev, (x, y))
 
 
-place(tablet(daily, 1300, 1.5), 790, 1050)       # daily page on the left, behind
-place(tablet(cover, 1130, -4), 1650, 1085)     # cover on the right, in front: it overlaps the right edge of the page iPad
+place(tablet(daily, 1080, 1.5), 745, 1105)       # daily page on the left, behind (the smaller iPad)
+place(tablet(cover, 1220, -4), 1600, 1085)     # cover on the right, in front and bigger: it overlaps the right edge of the page iPad
 
 # pencil lying on the cover
 pen = Image.new("RGBA", (900, 30), (0, 0, 0, 0))
@@ -264,8 +264,8 @@ pd.polygon([(850, 4), (900, 15), (850, 26)], fill=(232, 228, 222, 255))
 pd.polygon([(888, 12), (900, 15), (888, 18)], fill=(60, 56, 54, 255))
 pd.rectangle((120, 5, 720, 7), fill=(255, 255, 255, 255))
 pen = pen.rotate(-100, expand=True, resample=Image.BICUBIC)
-drop(pen.split()[3], 2185, 690, [(36, 52, 22, .30), (14, 20, 7, .45), (4, 6, 3, .6)])
-canvas.alpha_composite(pen, (2185, 690))
+drop(pen.split()[3], 2205, 690, [(36, 52, 22, .30), (14, 20, 7, .45), (4, 6, 3, .6)])
+canvas.alpha_composite(pen, (2205, 690))
 
 
 # "+1000 STICKERS" seal
