@@ -1,4 +1,4 @@
-"""Builds the RUNNING GIRL planner listing mockup (2400x1800): same style as the other mockups, with a cool seafoam palette,
+"""Builds the RUNNING GIRL planner listing mockup (2400x1800): same style as the other mockups, with a dusty-lavender palette,
 the cover on the left, the daily page on the right and the stylus on the left of the cover.
 Usage: python3 make_runninggirl_mockup.py <runninggirl_source.jpg> <runninggirl_cover.png> <out.png>
 <runninggirl_source> is the original 2000x2000 Running Girl mockup (daily page + app icons); <runninggirl_cover> is the clean cover page.
@@ -152,9 +152,9 @@ _xr = 1830 + 0.035 * _yy                     # right edge
 _beam = _smooth(_xl - 85, _xl + 130, _xx) * (1 - _smooth(_xr - 80, _xr + 80, _xx))
 _beam *= 1 - 0.26 * (_yy / H) ** 1.4         # the light weakens toward the bottom
 _bloom = np.exp(-(((_xx - 1180) / 760) ** 2 + ((_yy - 230) / 520) ** 2))     # a little warm glow up where the title sits
-_lit = np.array([212, 232, 227], np.float32)
-_shade_l = np.array([122, 150, 148], np.float32)
-_shade_r = np.array([150, 176, 172], np.float32)
+_lit = np.array([234, 222, 236], np.float32)
+_shade_l = np.array([150, 130, 156], np.float32)
+_shade_r = np.array([178, 160, 184], np.float32)
 _sx = _smooth(900, 2400, _xx)[..., None]
 _shade = _shade_l * (1 - _sx) + _shade_r * _sx
 _shade = _shade * (1 - 0.20 * (_yy / H)[..., None] * (1 - _beam[..., None]))     # shade sinks toward the bottom corners
@@ -287,11 +287,11 @@ drop(seal.split()[3], sx - seal.width // 2, sy - seal.height // 2, [(30, 46, 22,
 canvas.alpha_composite(seal, (sx - seal.width // 2, sy - seal.height // 2))
 
 d = ImageDraw.Draw(canvas)
-ink = (42, 78, 82)
+ink = (84, 56, 98)
 spaced(d, (W / 2, 44), "2026 - 2027   \u2022   +1000 STICKERS", ImageFont.truetype(serif, 40), ink, 9)
 spaced(d, (W / 2, 94), "RUNNING GIRL PLANNER", ImageFont.truetype(serif, 100), ink, 14)
 _sub = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-spaced(ImageDraw.Draw(_sub), (W / 2, 234), "RUN \u00b7 FUEL \u00b7 RECOVER \u00b7 GLOW", ImageFont.truetype(sans, 24), (34, 66, 70, 255), 5)
+spaced(ImageDraw.Draw(_sub), (W / 2, 234), "RUN \u00b7 FUEL \u00b7 RECOVER \u00b7 GLOW", ImageFont.truetype(sans, 24), (72, 46, 86, 255), 5)
 _sub = _sub.filter(ImageFilter.GaussianBlur(5)); _sub.putalpha(_sub.split()[3].point(lambda v: int(v * .75)))
 canvas.alpha_composite(_sub)
 d = ImageDraw.Draw(canvas)
