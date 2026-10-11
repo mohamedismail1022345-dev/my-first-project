@@ -1,5 +1,5 @@
 """Builds the STUDENT planner listing mockup (2400x1800): same style as the other mockups, with the same amber background as the Reading mockup,
-the daily page on the left, the cover on the right and the stylus beside the cover.
+the daily page on the left, the cover iPad in front on the right (overlapping the page iPad) and the stylus beside the cover.
 Usage: python3 make_student_mockup.py <student_source.jpg> <student_cover.webp> <out.png>
 <student_source> is the original 2000x2000 Student mockup (daily page + app icons); <student_cover> is the clean cover page.
 The stylus lying across the page is painted out of the page margin and the lessons table, and the cover year is changed to the range."""
@@ -245,8 +245,8 @@ def place(dev, cx, cy):
     canvas.alpha_composite(dev, (x, y))
 
 
-place(tablet(cover, 1130, -4), 1690, 1085)     # cover on the right, behind
-place(tablet(daily, 1300, 1.5), 815, 1050)       # daily page on the left, in front
+place(tablet(daily, 1300, 1.5), 790, 1050)       # daily page on the left, behind
+place(tablet(cover, 1130, -4), 1650, 1085)     # cover on the right, in front: it overlaps the right edge of the page iPad
 
 # pencil lying on the cover
 pen = Image.new("RGBA", (900, 30), (0, 0, 0, 0))
@@ -264,8 +264,8 @@ pd.polygon([(850, 4), (900, 15), (850, 26)], fill=(232, 228, 222, 255))
 pd.polygon([(888, 12), (900, 15), (888, 18)], fill=(60, 56, 54, 255))
 pd.rectangle((120, 5, 720, 7), fill=(255, 255, 255, 255))
 pen = pen.rotate(-100, expand=True, resample=Image.BICUBIC)
-drop(pen.split()[3], 2165, 690, [(36, 52, 22, .30), (14, 20, 7, .45), (4, 6, 3, .6)])
-canvas.alpha_composite(pen, (2165, 690))
+drop(pen.split()[3], 2185, 690, [(36, 52, 22, .30), (14, 20, 7, .45), (4, 6, 3, .6)])
+canvas.alpha_composite(pen, (2185, 690))
 
 
 # "+1000 STICKERS" seal
