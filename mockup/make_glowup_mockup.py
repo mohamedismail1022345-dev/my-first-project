@@ -288,7 +288,7 @@ canvas.alpha_composite(pen, (40, 690))
 
 
 # "+1000 STICKERS" seal
-sx, sy, sr = 2080, 300, 97
+sx, sy, sr = 1930, 300, 97
 seal = Image.new("RGBA", (sr * 2 + 40, sr * 2 + 40), (0, 0, 0, 0))
 sd = ImageDraw.Draw(seal)
 sc = sr + 20
@@ -323,7 +323,7 @@ gap = 22
 lab_font = ImageFont.truetype(sans, 19)
 LEFT = 505                                         # left edge of the cover tablet
 lab_w = sum(d.textlength(c, font=lab_font) for c in "WORKS WITH") + 5 * 9
-x0 = int(W / 2 + 150 - (IC * 4 + gap * 3) / 2)       # icons a little right of centre
+x0 = int(W / 2 - 70 - (IC * 4 + gap * 3) / 2)        # icons a little left of centre
 mk_i = Image.new("L", (IC, IC), 0); ImageDraw.Draw(mk_i).rounded_rectangle((0, 0, IC - 1, IC - 1), radius=21, fill=255)
 x = x0
 for ic in tiles:
