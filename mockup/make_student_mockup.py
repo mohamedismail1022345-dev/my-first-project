@@ -298,19 +298,19 @@ canvas.alpha_composite(_sub)
 d = ImageDraw.Draw(canvas)
 spaced(d, (W / 2, 232), "EVERYTHING FOR THE SCHOOL YEAR", ImageFont.truetype(sans, 24), (252, 249, 245), 5)
 # app icons (original artwork, cropped from the source mockup)
-IC = 88
+IC = 118
 tiles = [i.resize((IC, IC), Image.LANCZOS).filter(ImageFilter.UnsharpMask(1.2, 90, 0)) for i in (icon_acal, icon_rem, icon_gcal, icon_gpt)]
-gap = 22
+gap = 28
 lab_font = ImageFont.truetype(sans, 19)
 LEFT = 505                                         # left edge of the cover tablet
 lab_w = sum(d.textlength(c, font=lab_font) for c in "WORKS WITH") + 5 * 9
 x0 = int(W / 2 - (IC * 4 + gap * 3) / 2)             # icons centred under the subtitle
-mk_i = Image.new("L", (IC, IC), 0); ImageDraw.Draw(mk_i).rounded_rectangle((0, 0, IC - 1, IC - 1), radius=21, fill=255)
+mk_i = Image.new("L", (IC, IC), 0); ImageDraw.Draw(mk_i).rounded_rectangle((0, 0, IC - 1, IC - 1), radius=int(IC * 0.24), fill=255)
 x = x0
 for ic in tiles:
     tile = Image.new("RGBA", (IC, IC)); tile.paste(ic, (0, 0)); tile.putalpha(mk_i)
-    drop(mk_i, x, 296, [(2, 4, 3, .35), (6, 12, 12, .25)])
-    canvas.alpha_composite(tile, (x, 296))
+    drop(mk_i, x, 278, [(2, 5, 4, .35), (8, 16, 14, .25)])
+    canvas.alpha_composite(tile, (x, 278))
     x += IC + gap
 d = ImageDraw.Draw(canvas)
 spaced(d, (W / 2, 1728), "dreamwy", ImageFont.truetype(serif, 46), ink, 11)
