@@ -82,11 +82,19 @@ _clean = np.asarray(cover.crop((100, 610, 330, 730)).convert("L"), float)       
 GRAIN = _clean - np.asarray(Image.fromarray(_clean.astype("uint8")).filter(ImageFilter.GaussianBlur(3)), float)
 
 # 1. stylus off (patch-based inpainting keeps the watercolour leaves textured)
-cmask = pencil_mask(src.size, COVER_BOX, hl=27, hr=21)
+cmask = pencil_mask(src.size, COVER_BOX, hl=44, hr=30)
 if cv2 is not None:
     m8 = cv2.dilate(cmask.astype("uint8") * 255, np.ones((3, 3), np.uint8))
     dst = np.zeros((cover.height, cover.width, 3), np.uint8)
-    cv2.xphoto.inpaint(cv2.cvtColor(np.asarray(cover), cv2.COLOR_RGB2BGR), 255 - m8, dst, cv2.xphoto.INPAINT_SHIFTMAP)
+    # hide the cover's text blocks from the patch search first (otherwise bits of "OPEN PLANNER" get copied into the fill), paste them back after
+    TXT = [(320, 1024, 480, 1072), (150, 330, 650, 780)]            # button; title block (cover-crop coordinates)
+    guard = np.zeros((cover.height, cover.width), np.uint8)
+    for x0_, y0_, x1_, y1_ in TXT: guard[y0_:y1_, x0_:x1_] = 255
+    src_bgr = cv2.cvtColor(np.asarray(cover), cv2.COLOR_RGB2BGR)
+    clean_bgr = cv2.inpaint(src_bgr, guard, 9, cv2.INPAINT_TELEA)
+    cv2.xphoto.inpaint(clean_bgr, 255 - m8, dst, cv2.xphoto.INPAINT_SHIFTMAP)
+    keep = (guard > 0) & (m8 == 0)
+    dst[keep] = src_bgr[keep]
     out = cv2.cvtColor(dst, cv2.COLOR_BGR2RGB).astype(float)
     base = np.asarray(cover, float)
     # The patch fill has the right grain but its overall tone can drift. Keep its fine detail and take the broad tone from a
@@ -315,8 +323,8 @@ def place(dev, cx, cy):
     canvas.alpha_composite(dev, (x, y))
 
 
-place(tablet(cover, 1130, 4), 690, 1085)       # cover on the left, behind
-place(tablet(daily, 1300, -1.5), 1585, 1050)     # daily page on the right, in front
+place(tablet(cover, 1130, 4), 770, 1085)       # cover on the left, behind (its right edge slides under the page tablet)
+place(tablet(daily, 1300, -2.5), 1515, 1050)     # daily page on the right, in front
 
 # pencil lying on the cover
 pen = Image.new("RGBA", (900, 30), (0, 0, 0, 0))
@@ -334,8 +342,8 @@ pd.polygon([(850, 4), (900, 15), (850, 26)], fill=(232, 228, 222, 255))
 pd.polygon([(888, 12), (900, 15), (888, 18)], fill=(60, 56, 54, 255))
 pd.rectangle((120, 5, 720, 7), fill=(255, 255, 255, 255))
 pen = pen.rotate(-100, expand=True, resample=Image.BICUBIC)
-drop(pen.split()[3], 2185, 690, [(36, 52, 22, .30), (14, 20, 7, .45), (4, 6, 3, .6)])
-canvas.alpha_composite(pen, (2185, 690))
+drop(pen.split()[3], 2120, 690, [(36, 52, 22, .30), (14, 20, 7, .45), (4, 6, 3, .6)])
+canvas.alpha_composite(pen, (2120, 690))
 
 
 # "+1000 STICKERS" seal
