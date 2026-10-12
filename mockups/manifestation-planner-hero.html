@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Manifestation Planner Hero Mockup</title>
+<meta name="viewport" content="width=1269">
+<style>
+/* Landscape (4:3) hero. Designed at 1269x952 and rendered at 2x -> 2538x1904.
+   Theme: add ?theme=rose for the dusty-rose backdrop; default is the beige ADHD-planner backdrop. */
+@font-face{font-family:"Cormorant";font-weight:400;font-style:normal;src:url(assets/fonts/cormorant-garamond-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Cormorant";font-weight:500;font-style:normal;src:url(assets/fonts/cormorant-garamond-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:"Cormorant";font-weight:600;font-style:normal;src:url(assets/fonts/cormorant-garamond-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Cormorant";font-weight:400;font-style:italic;src:url(assets/fonts/cormorant-garamond-latin-400-italic.woff2) format("woff2")}
+@font-face{font-family:"Jost";font-weight:300;src:url(assets/fonts/jost-latin-300-normal.woff2) format("woff2")}
+@font-face{font-family:"Jost";font-weight:400;src:url(assets/fonts/jost-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Sacramento";font-weight:400;src:url(assets/fonts/sacramento-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"GreatVibes";font-weight:400;src:url(assets/fonts/great-vibes-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Caveat";font-weight:400;src:url(assets/fonts/caveat-latin-400-normal.woff2) format("woff2")}
+
+:root{
+  --title:#4A3224; --kicker:#5A4233; --wordmark:#4B3A30;
+  --bg-a:#D9CDBF; --bg-b:#CBBBAA; --bg-c:#B7A593; --bg-hi:rgba(255,252,246,.55);
+  --pg:#E9DED2; --card:#DCCBBB; --ink:#3B2D24; --ink2:#6B5645; --gold:#C4A06A; --hand:#3A2E27; --line:rgba(96,74,56,.22);
+}
+html.rose{
+  --title:#35241A; --kicker:#4A3426; --wordmark:#3F2F26;
+  --bg-a:#DCC4B7; --bg-b:#BC9A8A; --bg-c:#9F7C6B; --bg-hi:rgba(255,238,228,.6);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1269px;height:952px;overflow:hidden;background:#CBBBAA}
+
+.canvas{position:relative;width:1269px;height:952px;overflow:hidden;
+  background:
+    radial-gradient(60% 70% at 18% 8%, var(--bg-hi), rgba(255,255,255,0) 70%),
+    radial-gradient(45% 55% at 88% 12%, var(--bg-hi), rgba(255,255,255,0) 70%),
+    linear-gradient(165deg,var(--bg-a) 0%,var(--bg-b) 48%,var(--bg-c) 100%)}
+/* window light (beige) / glossy streaks (rose) */
+.light{position:absolute;pointer-events:none;transform-origin:0 0}
+.light.a{left:-20px;top:-30px;width:300px;height:360px;background:rgba(255,255,255,.14);transform:skewX(-24deg)}
+.light.b{left:290px;top:-30px;width:90px;height:420px;background:rgba(255,255,255,.09);transform:skewX(-24deg)}
+.light.c{left:-60px;top:400px;width:240px;height:330px;background:rgba(80,58,40,.07);transform:skewX(-24deg);filter:blur(10px)}
+html.rose .light.a{left:430px;top:-40px;width:150px;height:640px;background:rgba(255,236,224,.20);filter:blur(22px)}
+html.rose .light.b{left:900px;top:-40px;width:120px;height:560px;background:rgba(255,236,224,.18);filter:blur(24px)}
+html.rose .light.c{left:-40px;top:300px;width:220px;height:500px;background:rgba(70,40,28,.12);filter:blur(30px)}
+.grain{position:absolute;inset:0;opacity:.20;mix-blend-mode:soft-light;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .4  0 0 0 0 .3  0 0 0 0 .25  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(90% 85% at 50% 48%, rgba(0,0,0,0) 60%, rgba(70,48,34,.20) 100%)}
+
+/* ---------- headline ---------- */
+.kicker{position:absolute;left:0;right:0;top:22px;text-align:center;font-family:"Cormorant",serif;font-weight:500;font-size:21px;
+  letter-spacing:.2em;padding-left:.2em;color:var(--kicker);white-space:nowrap}
+.title{position:absolute;left:0;right:0;top:46px;text-align:center;font-family:"Cormorant",serif;font-weight:500;font-size:66px;line-height:1.1;
+  letter-spacing:.078em;padding-left:.078em;color:var(--title);white-space:nowrap}
+.sub{position:absolute;left:0;right:0;top:126px;text-align:center;font-family:"Jost",sans-serif;font-weight:300;font-size:15px;
+  letter-spacing:.34em;padding-left:.34em;color:rgba(255,251,246,.92);white-space:nowrap;text-shadow:0 1px 2px rgba(80,55,40,.15)}
+.apps{position:absolute;left:520px;top:154px;display:flex;gap:12px}
+.apps img{width:48px;height:48px;display:block;filter:drop-shadow(0 4px 7px rgba(70,48,34,.22))}
+.badge{position:absolute;left:237px;top:107px;width:100px;height:100px;transform:rotate(-9deg);filter:drop-shadow(0 4px 6px rgba(60,40,28,.28))}
+
+/* ---------- iPad ---------- */
+.ipad{position:absolute;border-radius:30px;padding:13px;
+  background:linear-gradient(145deg,#2F2926 0%,#161312 50%,#0B0A0A 100%);
+  box-shadow:0 0 0 1.5px #A79F99, 0 0 0 2.2px rgba(255,255,255,.28), 0 26px 46px rgba(52,34,24,.40), 0 8px 14px rgba(52,34,24,.28)}
+.ipad::before{content:"";position:absolute;inset:3px;border-radius:27px;border:1px solid rgba(255,255,255,.10);pointer-events:none}
+.ipad .screen{position:relative;width:100%;height:100%;border-radius:19px;overflow:hidden}
+.ipad .screen::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(118deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,0) 20%)}
+.ipad.left{left:137px;top:258px;width:451px;height:615px}
+.ipad.right{left:585px;top:200px;width:520px;height:685px}
+
+/* ---------- cover ---------- */
+.cover{background:
+  radial-gradient(75% 55% at 52% 42%, rgba(255,246,226,.80), rgba(255,246,226,0) 72%),
+  linear-gradient(172deg,#EEDDBE,#E8D3AE 55%,#DEC59B)}
+.cover .paper{position:absolute;inset:0;opacity:.6;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='500' height='500'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='.014' numOctaves='3' seed='11'/><feColorMatrix values='0 0 0 0 .72  0 0 0 0 .55  0 0 0 0 .34  0 0 0 .42 0'/></filter><rect width='100%' height='100%' filter='url(%23p)'/></svg>"),
+  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='q'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .36  0 0 0 0 .2  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23q)'/></svg>")}
+.cover svg.art{position:absolute;inset:0;width:100%;height:100%}
+.cover .t1{position:absolute;left:0;right:0;top:190px;text-align:center;font-family:"Cormorant",serif;font-weight:600;font-size:29px;letter-spacing:.07em;padding-left:.07em;color:#6E4E26}
+.cover .t2{position:absolute;left:0;right:0;top:222px;text-align:center;font-family:"GreatVibes",cursive;font-size:62px;line-height:1.25;color:#85602A;padding-left:36px}
+.cover .t3{position:absolute;left:0;right:0;top:316px;text-align:center;font-family:"Jost",sans-serif;font-weight:400;font-size:8.5px;letter-spacing:.32em;padding-left:.32em;color:#85705A}
+.cover .t4{position:absolute;left:0;right:0;top:486px;text-align:center;font-family:"Cormorant",serif;font-weight:500;font-size:11.5px;letter-spacing:.3em;padding-left:.3em;color:#6E4E26}
+.cover .t5{position:absolute;left:0;right:0;top:505px;text-align:center;font-family:"Cormorant",serif;font-style:italic;font-size:12.5px;line-height:1.3;color:#8A6A3A}
+
+/* ---------- planner page ---------- */
+.page{position:absolute;inset:0;background:var(--pg);font-family:"Jost",sans-serif;color:var(--ink)}
+.abs{position:absolute}
+.nav{right:26px;top:8px;display:flex;gap:9px;font-size:3.6px;letter-spacing:.2em;color:#85705F;text-transform:uppercase}
+.nav b{font-weight:500;color:var(--ink)}
+.dtitle{left:29px;top:30px;font-family:"Cormorant",serif;font-weight:500;font-size:11.5px;letter-spacing:.09em;color:var(--ink);white-space:nowrap}
+.dlinks{right:40px;top:36px;font-size:3.6px;letter-spacing:.2em;color:#85705F;text-transform:uppercase;white-space:nowrap}
+.strip{left:29px;top:49px;width:426px;height:20px;border-top:1px solid #B5A392}
+.strip .days{display:flex;justify-content:space-between;margin-top:2px}
+.day{width:13.7px;text-align:center;font-size:3.2px;color:#85705F}
+.day b{display:block;font-weight:400;font-size:4.3px;margin-top:2px;color:var(--ink2);width:9px;height:9px;line-height:9px;margin-left:2.35px;border-radius:50%}
+.day.on b{background:#8A7868;color:#fff}
+.card{top:72px;height:35px;width:209px;background:var(--card);border-radius:2px;text-align:center;padding-top:6px}
+.card .lab{font-family:"Sacramento",cursive;font-size:12.5px;line-height:1;color:#B58E52}
+.card .val{font-size:6.6px;margin-top:6px;color:var(--ink);letter-spacing:.02em}
+.sh{font-size:4.5px;letter-spacing:.18em;font-weight:500;color:var(--ink);text-transform:uppercase;white-space:nowrap}
+.su{height:0;border-top:1px solid #4F3E33;width:209px}
+.ln{position:relative;border-bottom:1px solid var(--line);display:flex;align-items:flex-end}
+.ln .h{font-family:"Caveat",cursive;font-size:9.4px;line-height:1;color:var(--hand);padding-bottom:2.2px;white-space:nowrap}
+.ln .n{position:absolute;left:3px;bottom:3px;font-size:3.6px;color:#85705F}
+.ln .tm{position:absolute;left:4px;bottom:3.4px;font-size:3.6px;letter-spacing:.14em;color:#85705F;text-transform:uppercase}
+.ln .ck{position:absolute;right:3px;bottom:3.5px;width:5px;height:5px}
+.ck{display:inline-block;position:relative}
+.ck.on::after{content:"";position:absolute;left:1.3px;top:-0.8px;width:1.8px;height:4px;border:solid #3A2E27;border-width:0 .8px .8px 0;transform:rotate(40deg)}
+.ck.box{border:.7px solid #85705F;border-radius:1px}
+.ck.circ{border:.7px solid #B99C5E;border-radius:50%}
+.act .h{padding-left:15px}
+.act .ck{position:absolute;left:3px;bottom:3.6px;right:auto;width:5px;height:5px}
+.pri .h{padding-left:14px}
+.hab{display:flex;justify-content:space-between;font-size:3.4px;letter-spacing:.16em;color:#6B5645;text-transform:uppercase;align-items:center;height:14px}
+.hab span{display:flex;align-items:center;gap:3px}
+.hab .ck{width:5px;height:5px}
+.hab .ck.on{background:rgba(185,156,94,.22);border-color:#A8864A}
+.hab .ck.on::after{left:1.2px;top:.1px;width:1.3px;height:2.8px;border-width:0 .7px .7px 0}
+.vib{display:flex;justify-content:space-between;align-items:center;font-size:3.3px;letter-spacing:.18em;color:#85705F;text-transform:uppercase;height:16px;padding:0 6px}
+.vib span{display:flex;flex-direction:column;align-items:center;gap:2px}
+.vib i{width:5px;height:5px;border:.7px solid #B99C5E;border-radius:50%}
+.vib i.f{background:#B99C5E}
+.tabs{right:0;top:66px;width:21px}
+.tab{height:42px;margin-bottom:1.5px;margin-left:3px;width:18px;border-radius:5px 0 0 5px;display:flex;align-items:center;justify-content:center;
+  writing-mode:vertical-rl;font-size:4.4px;letter-spacing:.2em;color:rgba(70,52,40,.62);text-transform:uppercase}
+.tab.on{color:#fff}
+.tab.on{margin-left:0;width:21px}
+.foot{left:29px;right:42px;bottom:9px;display:flex;justify-content:space-between;font-size:3.5px;letter-spacing:.2em;color:#85705F;text-transform:uppercase}
+.stk{position:absolute;filter:drop-shadow(0 2px 3px rgba(60,40,28,.28))}
+
+/* ---------- pencil ---------- */
+.pencil{position:absolute;left:211px;top:374px;width:17px;height:478px;transform:rotate(-9.7deg);z-index:10;
+  filter:drop-shadow(4px 8px 7px rgba(50,35,25,.34))}
+.pencil .body{position:absolute;inset:0;border-radius:8.5px 8.5px 0 0;
+  background:linear-gradient(90deg,#CFCBC6 0%,#F4F2EF 22%,#FFFFFF 50%,#F1EEEA 78%,#CBC6C0 100%);
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 38px),63% calc(100% - 8px),37% calc(100% - 8px),0 calc(100% - 38px))}
+.pencil .nib{position:absolute;left:50%;bottom:0;width:6px;height:9px;transform:translateX(-50%);
+  background:linear-gradient(90deg,#4A4543,#8A8480 50%,#4A4543);clip-path:polygon(0 0,100% 0,62% 100%,38% 100%)}
+
+.wordmark{position:absolute;left:0;right:0;top:917px;text-align:center;font-family:"Cormorant",serif;font-weight:500;font-size:25px;
+  letter-spacing:.42em;padding-left:.42em;color:var(--wordmark)}
+</style>
+<script>
+if(new URLSearchParams(location.search).get('theme')==='rose')document.documentElement.classList.add('rose');
+</script>
+</head>
+<body>
+<div class="canvas">
+  <div class="light a"></div><div class="light b"></div><div class="light c"></div>
+
+  <div class="kicker">2026 - 2027 &nbsp;•&nbsp; +1000 STICKERS</div>
+  <div class="title">MANIFESTATION PLANNER</div>
+  <div class="sub">VISION · GOALS · GRATITUDE · GLOW</div>
+  <div class="apps">
+    <img src="assets/app-calendar.png" alt=""><img src="assets/app-reminders.png" alt="">
+    <img src="assets/app-gcal.png" alt=""><img src="assets/app-chatgpt.png" alt="">
+  </div>
+
+  <!-- scalloped sticker badge -->
+  <svg class="badge" viewBox="0 0 100 100" id="badge"></svg>
+
+  <!-- left iPad: cover -->
+  <div class="ipad left"><div class="screen cover" id="cover">
+    <div class="paper"></div>
+    <svg class="art" id="coverArt" viewBox="0 0 425 589" preserveAspectRatio="none"></svg>
+    <div class="t1">MANIFESTATION</div>
+    <div class="t2">Planner</div>
+    <div class="t3">DREAM ✦ PLAN ✦ MANIFEST</div>
+    <div class="t4">2026 - 2027</div>
+    <div class="t5">A clearer mind<br>creates a brighter<br>future.</div>
+  </div></div>
+
+  <!-- right iPad: daily page -->
+  <div class="ipad right"><div class="screen">
+    <div class="page" id="page">
+      <svg class="abs" style="left:17px;top:6px;width:44px;height:12px" viewBox="0 0 44 12" fill="none" stroke="#8FA58E" stroke-width=".9">
+        <rect x="1" y="1" width="9" height="9" rx="2.5"/><circle cx="5.5" cy="5.5" r="1.8"/>
+        <rect x="16" y="1" width="9" height="9" rx="2.5"/><path d="M18.5 5.5l2 2 3-3.6"/>
+        <circle cx="35.5" cy="5.5" r="4.5"/><path d="M33 5.5h5M35.5 3v5"/>
+      </svg>
+      <div class="abs nav"><span>Index</span><b>Year</b><span>Vision</span><span>Goals</span><span>Manifest</span><span>Habits</span><span>Gratitude</span><span>Money</span><span>Self</span><span>Notes</span></div>
+
+      <div class="abs dtitle">TUESDAY, 5 JANUARY 2027</div>
+      <div class="abs dlinks">‹ Prev &nbsp;·&nbsp; Week &nbsp;·&nbsp; Month &nbsp;·&nbsp; Next ›</div>
+      <svg class="abs" style="left:477px;top:33px;width:8px;height:8px" viewBox="0 0 8 8" fill="#A99A8C"><circle cx="1.5" cy="1.5" r="1"/><circle cx="4" cy="1.5" r="1"/><circle cx="6.5" cy="1.5" r="1"/><circle cx="1.5" cy="4" r="1"/><circle cx="4" cy="4" r="1"/><circle cx="6.5" cy="4" r="1"/><circle cx="1.5" cy="6.5" r="1"/><circle cx="4" cy="6.5" r="1"/><circle cx="6.5" cy="6.5" r="1"/></svg>
+      <div class="abs strip"><div class="days" id="days"></div></div>
+
+      <div class="abs card" style="left:29px"><div class="lab">main focus</div><div class="val">Start the portfolio</div></div>
+      <div class="abs card" style="left:247px"><div class="lab">today's affirmation</div><div class="val">I attract good things</div>
+        <svg class="abs" style="right:5px;top:4px;width:12px;height:12px" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5.4" fill="#F4ECE4"/><path d="M3 5.2h5.4v1.6a2.4 2.4 0 0 1-2.4 2.4h-.6A2.4 2.4 0 0 1 3 6.8z" fill="#C97B76"/><path d="M8.4 5.8h.7a.9.9 0 0 1 0 1.8h-.8" fill="none" stroke="#C97B76" stroke-width=".7"/><path d="M4.6 4c0-.8.8-.8.4-1.5M6 4c0-.8.8-.8.4-1.5" stroke="#B9A593" stroke-width=".4" fill="none"/></svg></div>
+
+      <!-- left column -->
+      <div class="abs sh" style="left:29px;top:113px">Today I am grateful for</div>
+      <div class="abs su" style="left:29px;top:122px"></div>
+      <div class="abs" style="left:29px;top:123px;width:209px" id="grat"></div>
+
+      <div class="abs sh" style="left:29px;top:175px">Schedule</div>
+      <div class="abs su" style="left:29px;top:184px"></div>
+      <div class="abs" style="left:29px;top:185px;width:209px" id="sched"></div>
+
+      <div class="abs sh" style="left:29px;top:530px">Scripting - as if it is done</div>
+      <div class="abs su" style="left:29px;top:540px"></div>
+      <div class="abs" style="left:29px;top:541px;width:209px" id="script"></div>
+
+      <!-- right column -->
+      <div class="abs sh" style="left:247px;top:113px">Top 3 priorities</div>
+      <div class="abs su" style="left:247px;top:122px"></div>
+      <div class="abs" style="left:247px;top:123px;width:209px" id="pri"></div>
+
+      <div class="abs sh" style="left:247px;top:177px">Aligned actions</div>
+      <div class="abs su" style="left:247px;top:186px"></div>
+      <div class="abs" style="left:247px;top:187px;width:209px" id="act"></div>
+
+      <div class="abs sh" style="left:247px;top:449px">Habits</div>
+      <div class="abs su" style="left:247px;top:458px"></div>
+      <div class="abs hab" style="left:247px;top:459px;width:209px;padding:0 4px" id="hab"></div>
+
+      <div class="abs sh" style="left:247px;top:478px">Signs &amp; synchronicities</div>
+      <div class="abs su" style="left:247px;top:487px"></div>
+      <div class="abs" style="left:247px;top:488px;width:209px" id="signs"></div>
+
+      <div class="abs sh" style="left:247px;top:524px">My vibration today</div>
+      <div class="abs su" style="left:247px;top:533px"></div>
+      <div class="abs vib" style="left:247px;top:534px;width:209px" id="vib"></div>
+
+      <div class="abs sh" style="left:247px;top:561px">Evening reflection</div>
+      <div class="abs su" style="left:247px;top:570px"></div>
+      <div class="abs" style="left:247px;top:571px;width:209px" id="eve"></div>
+
+      <!-- illustrated "photo" stickers -->
+      <svg class="stk" style="left:148px;top:243px;width:86px;height:92px;transform:rotate(2deg)" viewBox="0 0 86 92">
+        <defs><linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F1CDB6"/><stop offset="1" stop-color="#F6E2C6"/></linearGradient></defs>
+        <rect x="2" y="3" width="82" height="86" fill="#FAF5EE"/>
+        <rect x="7" y="9" width="72" height="62" fill="url(#sky1)"/>
+        <circle cx="43" cy="48" r="13" fill="#F9E7B9"/><circle cx="43" cy="48" r="13" fill="none" stroke="#F3D7A0" stroke-width="1"/>
+        <path d="M7 58c14-9 26-9 38-3 12-8 24-8 34 0v16H7z" fill="#C79276"/><path d="M7 64c18-7 30-5 44 0 11-4 20-4 28 0v7H7z" fill="#A9735A"/>
+        <path d="M60 22c3-2 6-2 8 0M20 28c2-1.6 5-1.6 7 0" fill="none" stroke="#B88A70" stroke-width="1" stroke-linecap="round"/>
+        <rect x="26" y="-1" width="32" height="12" fill="#D6C1A7" opacity=".78" transform="rotate(-2 42 5)"/>
+        <text x="43" y="83" text-anchor="middle" font-family="Caveat" font-size="9" fill="#6B5645">new day</text>
+      </svg>
+      <svg class="stk" style="left:156px;top:347px;width:84px;height:88px;transform:rotate(-3deg)" viewBox="0 0 84 88">
+        <rect x="2" y="3" width="80" height="82" fill="#FAF5EE"/>
+        <rect x="7" y="9" width="70" height="60" fill="#DCC7B1"/>
+        <rect x="18" y="14" width="34" height="42" fill="#F6ECDD"/><path d="M35 14v42M18 35h34" stroke="#C9B49C" stroke-width="1.4"/>
+        <path d="M18 14l34 42M52 14L18 56" stroke="#FFFFFF" stroke-width="5" opacity=".28"/>
+        <path d="M52 36l18-6v24H52z" fill="#CDB59B"/>
+        <path d="M54 69c-2-14 2-24 8-30 2 10-1 22-8 30zM54 69c-8-8-14-16-14-24 8 4 14 14 14 24zM54 69c6-6 14-8 20-6-2 6-10 8-20 6z" fill="#7F9A6A"/>
+        <path d="M44 69h20l-3 10H47z" fill="#B98568"/>
+        <rect x="24" y="-1" width="32" height="12" fill="#D6C1A7" opacity=".78" transform="rotate(2 40 5)"/>
+      </svg>
+      <svg class="stk" style="left:382px;top:211px;width:86px;height:81px;transform:rotate(2deg)" viewBox="0 0 92 90" preserveAspectRatio="none">
+        <rect x="2" y="3" width="88" height="84" fill="#FAF5EE"/>
+        <rect x="7" y="9" width="78" height="62" fill="#E8DFD2"/>
+        <path d="M7 44c20-8 44-8 78 2v25H7z" fill="#D8CCBB"/>
+        <rect x="14" y="44" width="30" height="20" rx="1.5" fill="#B99B7C" transform="rotate(-8 29 54)"/><rect x="17" y="46" width="24" height="16" fill="#F2E8D8" transform="rotate(-8 29 54)"/>
+        <circle cx="52" cy="40" r="9" fill="none" stroke="#3A2E27" stroke-width="1.6"/><circle cx="70" cy="40" r="9" fill="none" stroke="#3A2E27" stroke-width="1.6"/><path d="M61 40h0" stroke="#3A2E27" stroke-width="1.6"/>
+        <ellipse cx="66" cy="60" rx="14" ry="4" fill="#CBB89F"/><path d="M57 50h18v6a9 9 0 0 1-18 0z" fill="#F4EBDD" stroke="#CDBBA3" stroke-width="1"/><path d="M60 51h12v3H60z" fill="#8A5A3C"/>
+        <rect x="30" y="-1" width="30" height="12" fill="#D6C1A7" opacity=".78" transform="rotate(-3 45 5)"/>
+      </svg>
+      <svg class="stk" style="left:379px;top:207px;width:20px;height:20px" viewBox="0 0 20 20">
+        <circle cx="10" cy="10" r="9" fill="#FFFFFF"/><path d="M10 3.5c.7 4 2.5 5.8 6.5 6.5-4 .7-5.8 2.5-6.5 6.5-.7-4-2.5-5.8-6.5-6.5 4-.7 5.8-2.5 6.5-6.5z" fill="#CFC8C2"/>
+      </svg>
+      <svg class="stk" style="left:392px;top:333px;width:66px;height:62px;transform:rotate(-4deg)" viewBox="0 0 66 62">
+        <rect x="3" y="3" width="60" height="56" rx="12" fill="#FFFFFF"/>
+        <rect x="8" y="8" width="50" height="46" rx="8" fill="#F1E5D3"/>
+        <rect x="23" y="26" width="20" height="22" rx="3.5" fill="#FBF3E6" stroke="#CDB79F" stroke-width="1"/>
+        <rect x="21" y="23" width="24" height="5" rx="2" fill="#B98568"/>
+        <path d="M33 11c-4.5 5-1.5 9 0 10 1.5-1 4.5-5 0-10z" fill="#E7A15B"/><path d="M33 21v3" stroke="#6B5645" stroke-width="1"/>
+        <path d="M13 49l3.5-9 4 9z" fill="#C7A0C0"/><path d="M47 49l3-8 4.5 8z" fill="#9FBFB8"/>
+        <path d="M13 16l1.4 3.2 3.2 1.4-3.2 1.4L13 25l-1.4-3-3.2-1.4 3.2-1.4z" fill="#C9A66A" opacity=".8"/>
+      </svg>
+
+      <div class="abs tabs" id="tabs"></div>
+      <div class="abs foot"><span>© Dreamwy &nbsp;·&nbsp; Manifestation &amp; Goals Planner 2027</span><span>21</span><span>Back to index</span></div>
+    </div>
+  </div></div>
+
+  <div class="pencil"><div class="body"></div><div class="nib"></div></div>
+  <div class="wordmark">dreamwy</div>
+  <div class="vignette"></div><div class="grain"></div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const NS='http://www.w3.org/2000/svg';
+const el=(tag,attrs={},parent)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e};
+let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646};
+
+/* ---------- sticker badge ---------- */
+(()=>{const s=$('badge');const n=34,R=48,r=44.5;let d='';
+  for(let i=0;i<n*2;i++){const a=i/(n*2)*Math.PI*2, rad=i%2?r:R;d+=(i?'L':'M')+(50+rad*Math.cos(a)).toFixed(2)+' '+(50+rad*Math.sin(a)).toFixed(2)}
+  el('path',{d:d+'Z',fill:'#7A5546'},s);
+  el('circle',{cx:50,cy:50,r:38,fill:'none',stroke:'rgba(255,240,228,.75)','stroke-width':.8,'stroke-dasharray':'1.2 1.8'},s);
+  const t1=el('text',{x:50,y:48,'text-anchor':'middle','font-family':'Cormorant','font-weight':500,'font-size':20,fill:'#FBF1E8'},s);t1.textContent='+1000';
+  const t2=el('text',{x:50,y:63,'text-anchor':'middle','font-family':'Jost','font-weight':400,'font-size':8.2,'letter-spacing':'1.6',fill:'#F3E4D8'},s);t2.textContent='STICKERS';
+  el('path',{d:'M26 53h48',stroke:'rgba(255,240,228,.6)','stroke-width':.6},s);
+})();
+
+/* ---------- cover artwork ---------- */
+function bez(p,t){const u=1-t;return [u*u*u*p[0][0]+3*u*u*t*p[1][0]+3*u*t*t*p[2][0]+t*t*t*p[3][0],u*u*u*p[0][1]+3*u*u*t*p[1][1]+3*u*t*t*p[2][1]+t*t*t*p[3][1]]}
+function tan(p,t){const u=1-t;return [3*u*u*(p[1][0]-p[0][0])+6*u*t*(p[2][0]-p[1][0])+3*t*t*(p[3][0]-p[2][0]),3*u*u*(p[1][1]-p[0][1])+6*u*t*(p[2][1]-p[1][1])+3*t*t*(p[3][1]-p[2][1])]}
+const OLIVES=['#7B8A58','#6C7C4D','#8B9966','#5F6F44','#74854F'];
+function leaf(g,x,y,ang,L,col){
+  const W=L*.27;
+  const gr=el('g',{transform:`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(ang*180/Math.PI).toFixed(1)})`},g);
+  el('path',{d:`M0 0C${L*.25} ${-W} ${L*.72} ${-W*.95} ${L} 0C${L*.72} ${W*.95} ${L*.25} ${W} 0 0Z`,fill:col,opacity:.93},gr);
+  el('path',{d:`M0 0L${L*.92} 0`,stroke:'rgba(255,255,230,.35)','stroke-width':.6,fill:'none'},gr);
+  el('path',{d:`M${L*.2} 0L${L*.45} ${-W*.6}M${L*.2} 0L${L*.45} ${W*.6}M${L*.5} 0L${L*.72} ${-W*.5}M${L*.5} 0L${L*.72} ${W*.5}`,stroke:'rgba(255,255,230,.18)','stroke-width':.5,fill:'none'},gr);
+}
+function blossoms(g,x,y){
+  for(let i=0;i<6;i++){const a=rnd()*6.283,d=rnd()*5.5;
+    const cx=x+Math.cos(a)*d,cy=y+Math.sin(a)*d;
+    el('circle',{cx,cy,r:2.5+rnd()*.9,fill:'#F6EEE0',stroke:'#D8CCB4','stroke-width':.4},g);
+    el('circle',{cx,cy,r:.7,fill:'#C9A24B'},g)}
+}
+function branch(g,P,n,L,flowers){
+  el('path',{d:`M${P[0]}C${P[1]} ${P[2]} ${P[3]}`.replace(/,/g,' ').replace(/(\d) (\d)/g,'$1 $2'),fill:'none',stroke:'#6B6A45','stroke-width':1.6,'stroke-linecap':'round'},g);
+  const pts=P.map(s=>s.split(',').map(Number));
+  for(let i=0;i<n;i++){
+    const t=(i+1)/(n+1), [x,y]=bez(pts,t), [tx,ty]=tan(pts,t), a=Math.atan2(ty,tx);
+    const side=i%2?1:-1, spread=(.62+rnd()*.34), len=L*(1-.42*t)*(.85+rnd()*.3);
+    leaf(g,x,y,a+side*spread,len,OLIVES[Math.floor(rnd()*OLIVES.length)]);
+    if(flowers&&i%3===1){
+      const ta=a-side*(.9+rnd()*.3), tl=17+rnd()*8, ex=x+Math.cos(ta)*tl, ey=y+Math.sin(ta)*tl;
+      el('path',{d:`M${x} ${y}Q${(x+ex)/2+3} ${(y+ey)/2-3} ${ex} ${ey}`,stroke:'#7A7850','stroke-width':.8,fill:'none'},g);
+      blossoms(g,ex,ey);
+    }
+  }
+  const [ex,ey]=pts[3],[tx,ty]=tan(pts,1);leaf(g,ex,ey,Math.atan2(ty,tx),L*.6,OLIVES[0]);
+}
+(()=>{const s=$('coverArt');
+  // frame lines
+  el('path',{d:'M14 14V575M411 14V575',stroke:'#B79A62','stroke-width':.8,opacity:.65,fill:'none'},s);
+  // botanical corners
+  const g1=el('g',{},s);
+  branch(g1,['-12,175','30,125','78,62','165,14'],11,44,true);
+  branch(g1,['-12,96','24,70','62,40','112,16'],8,32,true);
+  const g2=el('g',{},s);
+  branch(g2,['440,600','424,528','388,468','332,436'],10,42,true);
+  branch(g2,['440,556','428,520','410,492','384,470'],6,28,true);
+  // moon + rays
+  const mx=212,my=108,gm=el('g',{},s);
+  for(let i=0;i<48;i++){const a=i/48*6.283,l=(i%2?9:15),r0=36;
+    el('path',{d:`M${mx+Math.cos(a)*r0} ${my+Math.sin(a)*r0}L${mx+Math.cos(a)*(r0+l)} ${my+Math.sin(a)*(r0+l)}`,stroke:'#B28F52','stroke-width':.55,opacity:.85},gm)}
+  el('circle',{cx:mx,cy:my,r:32,fill:'none',stroke:'#B28F52','stroke-width':.5,opacity:.6},gm);
+  el('path',{d:`M${mx+12} ${my-24}A25 25 0 1 0 ${mx+12} ${my+24}A19 19 0 1 1 ${mx+12} ${my-24}Z`,fill:'#C49A4C'},gm);
+  const star=(x,y,r,c)=>el('path',{d:`M${x} ${y-r}C${x+r*.12} ${y-r*.12} ${x+r*.12} ${y-r*.12} ${x+r} ${y}C${x+r*.12} ${y+r*.12} ${x+r*.12} ${y+r*.12} ${x} ${y+r}C${x-r*.12} ${y+r*.12} ${x-r*.12} ${y+r*.12} ${x-r} ${y}C${x-r*.12} ${y-r*.12} ${x-r*.12} ${y-r*.12} ${x} ${y-r}Z`,fill:c||'#B28F52'},s);
+  star(mx,34,5);star(mx,170,5);el('path',{d:`M${mx} 178V196`,stroke:'#B28F52','stroke-width':.6},s);star(mx,203,3);
+  star(mx,240,3);
+  // sun
+  const sx=222,sy=406,gs=el('g',{},s);
+  for(let i=0;i<24;i++){const a=i/24*6.283,l=(i%2?8:14),r0=20;
+    const tipx=sx+Math.cos(a)*(r0+l),tipy=sy+Math.sin(a)*(r0+l);
+    el('path',{d:`M${sx+Math.cos(a-.09)*r0} ${sy+Math.sin(a-.09)*r0}L${tipx} ${tipy}L${sx+Math.cos(a+.09)*r0} ${sy+Math.sin(a+.09)*r0}`,fill:'none',stroke:'#B28F52','stroke-width':.8},gs)}
+  el('circle',{cx:sx,cy:sy,r:15,fill:'none',stroke:'#B28F52','stroke-width':1},gs);el('circle',{cx:sx,cy:sy,r:10.5,fill:'none',stroke:'#B28F52','stroke-width':.7},gs);el('circle',{cx:sx,cy:sy,r:4,fill:'#C49A4C'},gs);
+  star(sx,350,3);el('path',{d:`M${sx} 356V366`,stroke:'#B28F52','stroke-width':.6},s);
+  el('path',{d:`M${sx} 446V462`,stroke:'#B28F52','stroke-width':.6},s);star(sx,468,3);star(sx,476,1.6);
+  // bottom rule
+  el('path',{d:'M150 570H283',stroke:'#B28F52','stroke-width':.5,opacity:.7},s);
+})();
+
+/* ---------- page content ---------- */
+const WK=['S','M','T','W','T','F','S'];
+$('days').innerHTML=Array.from({length:31},(_,k)=>{const d=k+1;
+  return `<div class="day${d===5?' on':''}">${WK[(5+d-1)%7]}<b>${d}</b></div>`}).join('');
+
+const ck=(on,type='box')=>`<i class="ck ${type}${on?' on':''}"></i>`;
+const rows=(arr,h,cls='')=>arr.map(r=>`<div class="ln ${cls}" style="height:${h}px">${r}</div>`).join('');
+
+$('grat').innerHTML=rows(['A clean inbox before lunch, finally','Mia\'s voice note that made me laugh out loud','Slow coffee in the sun by the window'].map((t,i)=>`<span class="n">${i+1}</span><span class="h" style="padding-left:14px">${t}</span>`),15.2);
+
+const SCHED=[['6 AM','Wake up, glass of water, open the curtains'],['7 AM','Yoga + journal, three pages before my phone'],['8 AM','Matcha + emails'],['9 AM','Deep work'],['10 AM','Team call'],['11 AM','Lunch with Sara'],['12 PM','Errands'],['1 PM','Write 3 pages'],['2 PM','Coffee walk'],['3 PM','Call Lena'],['4 PM','Pilates class, then stretch at home'],['5 PM','Cook dinner: salmon, rice and salad'],['8 PM','Read 20 pages of my new book in bed'],['9 PM','Skincare + plan tomorrow, lights off by 10']];
+$('sched').innerHTML=rows(SCHED.map(([t,x])=>`<span class="tm">${t}</span><span class="h" style="padding-left:23px">${x}</span>`),24.4);
+
+$('script').innerHTML=rows(['I wake up in my bright new flat,','coffee in hand, with the job I love.','My savings grow every month and','I travel twice a year with ease.','I am so happy and grateful now.'].map(t=>`<span class="h" style="padding-left:3px">${t}</span>`),14.6);
+
+$('pri').innerHTML=rows([['Finish the logo draft and send it to Nora',1],['Send the invoice for the October project',0],['Book the Lisbon flight for the spring trip',1]].map(([t,c],i)=>`<span class="n">${i+1}</span><span class="h">${t}</span><i class="ck on" style="${c?'':'visibility:hidden'};position:absolute;right:3px;bottom:3.5px;width:5px;height:5px"></i>`),15.5,'pri');
+
+const ACT=[['Update vision board',1],['Put $50 in savings',1],['Apply for the course',0],['Post the new shop item with nice photos',1],['Clean the deck and light a candle',1],['Read 20 pages',1],['Email the gallery',1],['Book the Lisbon flight',1],['Script for 10 minutes about my dream home',1]];
+$('act').innerHTML=rows(ACT.map(([t,c])=>`${c?ck(1,'').replace('class="ck ','class="ck '):ck(0,'circ')}<span class="h">${t}</span>`),28.7,'act');
+
+$('hab').innerHTML=[['Meditate',1],['Journal',1],['Move',1],['Water',1],['Read',0]].map(([t,c])=>`<span>${ck(c)}${t}</span>`).join('');
+
+$('signs').innerHTML=rows(['Saw 11:11 on the oven clock','Butterfly at the window again'].map(t=>`<span class="h" style="padding-left:3px">${t}</span>`),17);
+
+$('vib').innerHTML=['Low','Calm','Good','Joyful','Abundant'].map((t,i)=>`<span><i class="${i===1?'f':''}"></i>${t}</span>`).join('');
+
+$('eve').innerHTML=rows(['Felt light, calm and on purpose today','Proud of saying yes to the call today','Tomorrow: finish the portfolio before noon'].map(t=>`<span class="h" style="padding-left:3px">${t}</span>`),15.5);
+
+const TABC=['#E2C7C0','#E3BDB6','#DCC6C0','#D9C7C4','#D5C8C8','#D1C8CB','#CDC8CE','#C9C7D0','#C6C6D1','#C2C5D2','#BFC4D3','#BCC3D4','#B9C2D5'];
+$('tabs').innerHTML=['2027','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map((t,i)=>`<div class="tab${i===1?' on':''}" style="background:${i===1?'#D98F8C':TABC[i]}">${t}</div>`).join('');
+</script>
+</body>
+</html>
