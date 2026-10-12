@@ -360,13 +360,13 @@ gap = 22
 lab_font = ImageFont.truetype(sans, 19)
 LEFT = 505                                         # left edge of the cover tablet
 lab_w = sum(d.textlength(c, font=lab_font) for c in "WORKS WITH") + 5 * 9
-x0 = int(LEFT + lab_w + 28)
+x0 = 1527                                          # icons above the page iPad's top edge, as marked
 mk_i = Image.new("L", (IC, IC), 0); ImageDraw.Draw(mk_i).rounded_rectangle((0, 0, IC - 1, IC - 1), radius=21, fill=255)
 x = x0
 for ic in tiles:
     tile = Image.new("RGBA", (IC, IC)); tile.paste(ic, (0, 0)); tile.putalpha(mk_i)
-    drop(mk_i, x, 330, [(2, 4, 3, .35), (6, 12, 12, .25)])
-    canvas.alpha_composite(tile, (x, 330))
+    drop(mk_i, x, 272, [(2, 4, 3, .35), (6, 12, 12, .25)])
+    canvas.alpha_composite(tile, (x, 272))
     x += IC + gap
 d = ImageDraw.Draw(canvas)
 spaced(d, (W / 2, 1728), "dreamwy", ImageFont.truetype(serif, 46), ink, 11)
